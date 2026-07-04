@@ -16,8 +16,8 @@ src/app/
 └── features/
     ├── auth/login/      # implémenté
     ├── dashboard/       # implémenté (placeholder)
-    ├── clients/         # scaffolding — phase 2
-    ├── projects/        # scaffolding — phase 3
+    ├── clients/         # implémenté (liste, création, édition)
+    ├── projects/        # implémenté (liste, création/édition + workflow)
     ├── planning/        # scaffolding — phase 4
     ├── resources/       # scaffolding — phase 5
     ├── billing/         # scaffolding — phase 6
@@ -31,4 +31,4 @@ src/app/
 npm run start   # ng serve --port 4200
 ```
 
-Ouvrir [http://localhost:4200](http://localhost:4200). Se connecter avec le compte admin créé par `npm run prisma:seed` côté API (`admin@gestion-studio.mg` / `ChangeMe123!`).
+Ouvrir [http://localhost:4200](http://localhost:4200). Se connecter avec l'un des comptes de démonstration créés par `npm run prisma:seed` côté API (voir [apps/api/README.md](../api/README.md) pour la liste des comptes par rôle — mot de passe commun `ChangeMe123!`). Le seed inclut aussi 8 clients et 10 projets de démonstration.
