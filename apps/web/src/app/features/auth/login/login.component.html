@@ -1,0 +1,53 @@
+<div class="flex min-h-screen items-center justify-center bg-gs-black px-4 py-8">
+  <form
+    class="w-full max-w-sm bg-gs-dark-gray rounded-xl p-6 sm:p-8 shadow-xl border border-white/5"
+    (ngSubmit)="submit()"
+  >
+    <div class="flex items-center gap-2 mb-6">
+      <gs-icon name="logo" [size]="26" class="text-gs-blue" />
+      <h1 class="font-display text-2xl font-semibold text-gs-blue">
+        {{ 'auth.login.title' | translate }}
+      </h1>
+    </div>
+
+    <label class="block text-sm text-gs-light/70 mb-1">{{ 'auth.login.email' | translate }}</label>
+    <div class="relative mb-4">
+      <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gs-light/40">
+        <gs-icon name="mail" [size]="16" />
+      </span>
+      <input
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        required
+        class="w-full rounded-md bg-gs-black border border-white/10 pl-10 pr-3 py-2 text-gs-light focus:outline-none focus:border-gs-blue"
+      />
+    </div>
+
+    <label class="block text-sm text-gs-light/70 mb-1">{{ 'auth.login.password' | translate }}</label>
+    <div class="relative mb-6">
+      <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gs-light/40">
+        <gs-icon name="lock" [size]="16" />
+      </span>
+      <input
+        type="password"
+        name="password"
+        [(ngModel)]="password"
+        required
+        class="w-full rounded-md bg-gs-black border border-white/10 pl-10 pr-3 py-2 text-gs-light focus:outline-none focus:border-gs-blue"
+      />
+    </div>
+
+    @if (error(); as errorKey) {
+      <p class="text-gs-orange text-sm mb-4">{{ errorKey | translate }}</p>
+    }
+
+    <button
+      type="submit"
+      [disabled]="loading()"
+      class="w-full rounded-md bg-gs-blue text-gs-black font-semibold py-2 hover:opacity-90 disabled:opacity-50 transition-opacity"
+    >
+      {{ 'auth.login.submit' | translate }}
+    </button>
+  </form>
+</div>

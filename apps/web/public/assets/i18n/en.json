@@ -1,0 +1,29 @@
+{
+  "app": {
+    "title": "Gestion Studio"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "clients": "Clients & Contacts",
+    "projects": "Projects & Services",
+    "planning": "Planning & Bookings",
+    "resources": "Resources",
+    "billing": "Billing & Finance",
+    "reporting": "Reporting & Analytics",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email address",
+      "password": "Password",
+      "submit": "Sign in",
+      "error": "Invalid credentials."
+    }
+  },
+  "common": {
+    "language": "Language",
+    "loading": "Loading...",
+    "coming_soon": "Module coming in a future phase."
+  }
+}
