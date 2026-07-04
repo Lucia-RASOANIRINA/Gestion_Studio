@@ -1,0 +1,15 @@
+{
+  "errors": {
+    "not_found": "Resource not found.",
+    "unauthorized": "Authentication required.",
+    "forbidden": "Access denied.",
+    "validation_failed": "The submitted data is invalid.",
+    "invalid_credentials": "Invalid credentials.",
+    "account_locked": "Account locked after too many failed attempts. Please try again later.",
+    "internal_error": "An internal error occurred."
+  },
+  "auth": {
+    "login_success": "Login successful.",
+    "logout_success": "Logout successful."
+  }
+}
