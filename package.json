@@ -1,0 +1,25 @@
+{
+  "name": "gestion-studio",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Plateforme de gestion de services pour maison de production audio (Madagascar)",
+  "workspaces": [
+    "apps/api",
+    "apps/web",
+    "packages/shared"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:web": "npm run start --workspace=apps/web",
+    "build:shared": "npm run build --workspace=packages/shared",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "db:up": "docker compose up -d postgres redis minio",
+    "db:down": "docker compose down",
+    "prisma:generate": "npm run prisma:generate --workspace=apps/api",
+    "prisma:migrate": "npm run prisma:migrate --workspace=apps/api"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
