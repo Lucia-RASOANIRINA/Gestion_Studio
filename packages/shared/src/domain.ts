@@ -1,34 +1,40 @@
+/**
+ * Ces enums reflètent exactement les valeurs des enums Prisma correspondants
+ * (`apps/api/prisma/schema.prisma`) afin que le frontend puisse les utiliser
+ * directement sans conversion de casse.
+ */
+
 /** Types de service proposés par la maison de production (personnalisables via les paramètres). */
 export enum ServiceType {
-  RECORDING = "recording",
-  MIXING = "mixing",
-  MASTERING = "mastering",
-  POST_PRODUCTION = "post_production",
-  VOICE_OVER = "voice_over",
-  EQUIPMENT_RENTAL = "equipment_rental",
-  LIVE_EVENT = "live_event",
-  OTHER = "other",
+  RECORDING = "RECORDING",
+  MIXING = "MIXING",
+  MASTERING = "MASTERING",
+  POST_PRODUCTION = "POST_PRODUCTION",
+  VOICE_OVER = "VOICE_OVER",
+  EQUIPMENT_RENTAL = "EQUIPMENT_RENTAL",
+  LIVE_EVENT = "LIVE_EVENT",
+  OTHER = "OTHER",
 }
 
 /** Statuts du workflow projet, avec transitions contrôlées par permission. */
 export enum ProjectStatus {
-  QUOTE = "quote",
-  VALIDATED = "validated",
-  IN_PROGRESS = "in_progress",
-  REVIEW = "review",
-  DELIVERED = "delivered",
-  INVOICED = "invoiced",
-  ARCHIVED = "archived",
+  QUOTE = "QUOTE",
+  VALIDATED = "VALIDATED",
+  IN_PROGRESS = "IN_PROGRESS",
+  REVIEW = "REVIEW",
+  DELIVERED = "DELIVERED",
+  INVOICED = "INVOICED",
+  ARCHIVED = "ARCHIVED",
 }
 
 /** Segments de clientèle. */
 export enum ClientSegment {
-  ARTIST = "artist",
-  LABEL = "label",
-  ADVERTISING_AGENCY = "advertising_agency",
-  COMPANY = "company",
-  INSTITUTION = "institution",
-  OTHER = "other",
+  ARTIST = "ARTIST",
+  LABEL = "LABEL",
+  ADVERTISING_AGENCY = "ADVERTISING_AGENCY",
+  COMPANY = "COMPANY",
+  INSTITUTION = "INSTITUTION",
+  OTHER = "OTHER",
 }
 
 export enum Currency {
@@ -38,11 +44,11 @@ export enum Currency {
 }
 
 export enum PaymentMethod {
-  MVOLA = "mvola",
-  ORANGE_MONEY = "orange_money",
-  AIRTEL_MONEY = "airtel_money",
-  CASH = "cash",
-  BANK_TRANSFER = "bank_transfer",
+  MVOLA = "MVOLA",
+  ORANGE_MONEY = "ORANGE_MONEY",
+  AIRTEL_MONEY = "AIRTEL_MONEY",
+  CASH = "CASH",
+  BANK_TRANSFER = "BANK_TRANSFER",
 }
 
 export const DEFAULT_TIMEZONE = "Indian/Antananarivo"; // UTC+3
