@@ -19,11 +19,43 @@ export const routes: Routes = [
       },
       {
         path: "clients",
-        loadComponent: () => import("./features/clients/clients.component").then((m) => m.ClientsComponent),
+        children: [
+          {
+            path: "",
+            loadComponent: () =>
+              import("./features/clients/clients-list.component").then((m) => m.ClientsListComponent),
+          },
+          {
+            path: "new",
+            loadComponent: () =>
+              import("./features/clients/client-form.component").then((m) => m.ClientFormComponent),
+          },
+          {
+            path: ":id/edit",
+            loadComponent: () =>
+              import("./features/clients/client-form.component").then((m) => m.ClientFormComponent),
+          },
+        ],
       },
       {
         path: "projects",
-        loadComponent: () => import("./features/projects/projects.component").then((m) => m.ProjectsComponent),
+        children: [
+          {
+            path: "",
+            loadComponent: () =>
+              import("./features/projects/projects-list.component").then((m) => m.ProjectsListComponent),
+          },
+          {
+            path: "new",
+            loadComponent: () =>
+              import("./features/projects/project-form.component").then((m) => m.ProjectFormComponent),
+          },
+          {
+            path: ":id",
+            loadComponent: () =>
+              import("./features/projects/project-form.component").then((m) => m.ProjectFormComponent),
+          },
+        ],
       },
       {
         path: "planning",

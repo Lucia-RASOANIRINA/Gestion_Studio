@@ -12,6 +12,9 @@
     "reporting": "Reporting & Analytics",
     "settings": "Settings"
   },
+  "dashboard": {
+    "subtitle": "Gestion Studio — management platform for an audio production house."
+  },
   "auth": {
     "login": {
       "title": "Login",
@@ -25,5 +28,100 @@
     "language": "Language",
     "loading": "Loading...",
     "coming_soon": "Module coming in a future phase."
+  },
+  "clients": {
+    "add": "New client",
+    "search_placeholder": "Search clients...",
+    "all_segments": "All segments",
+    "empty": "No clients found.",
+    "total_suffix": "client(s)",
+    "segment": {
+      "ARTIST": "Artist",
+      "LABEL": "Label",
+      "ADVERTISING_AGENCY": "Ad agency",
+      "COMPANY": "Company",
+      "INSTITUTION": "Institution",
+      "OTHER": "Other"
+    },
+    "table": {
+      "name": "Name",
+      "segment": "Segment",
+      "contact": "Contact",
+      "projects": "Projects",
+      "reliability": "Reliability",
+      "actions": "Actions"
+    },
+    "form": {
+      "create_title": "New client",
+      "edit_title": "Edit client",
+      "name": "Name",
+      "name_error": "Name must be between 2 and 200 characters.",
+      "segment": "Segment",
+      "email": "Email",
+      "email_error": "Invalid email address.",
+      "phone": "Phone",
+      "phone_error": "Phone must be in the +261 followed by 9 digits format.",
+      "address": "Address",
+      "notes": "Notes",
+      "save": "Save",
+      "cancel": "Cancel",
+      "error": "An error occurred while saving."
+    }
+  },
+  "projects": {
+    "add": "New project",
+    "search_placeholder": "Search projects...",
+    "all_statuses": "All statuses",
+    "empty": "No projects found.",
+    "total_suffix": "project(s)",
+    "status": {
+      "QUOTE": "Quote",
+      "VALIDATED": "Validated",
+      "IN_PROGRESS": "In progress",
+      "REVIEW": "Review",
+      "DELIVERED": "Delivered",
+      "INVOICED": "Invoiced",
+      "ARCHIVED": "Archived"
+    },
+    "service_type": {
+      "RECORDING": "Recording",
+      "MIXING": "Mixing",
+      "MASTERING": "Mastering",
+      "POST_PRODUCTION": "Post-production",
+      "VOICE_OVER": "Voice over",
+      "EQUIPMENT_RENTAL": "Equipment rental",
+      "LIVE_EVENT": "Live event",
+      "OTHER": "Other"
+    },
+    "table": {
+      "reference": "Reference",
+      "title": "Title",
+      "client": "Client",
+      "service_type": "Service type",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "form": {
+      "create_title": "New project",
+      "edit_title": "Edit project",
+      "title": "Title",
+      "title_error": "Title must be between 2 and 200 characters.",
+      "client": "Client",
+      "client_placeholder": "Select a client",
+      "client_error": "Client is required.",
+      "service_type": "Service type",
+      "description": "Description",
+      "budget": "Budget",
+      "currency": "Currency",
+      "start_date": "Start date",
+      "due_date": "Due date",
+      "save": "Save",
+      "cancel": "Cancel",
+      "error": "An error occurred while saving.",
+      "workflow": "Workflow",
+      "move_to": "Move to",
+      "no_transition": "No transition available from this status.",
+      "transition_error": "This transition is not allowed for your role."
+    }
   }
 }

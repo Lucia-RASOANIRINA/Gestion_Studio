@@ -12,6 +12,9 @@
     "reporting": "Reporting & Analytics",
     "settings": "Paramètres"
   },
+  "dashboard": {
+    "subtitle": "Gestion Studio — plateforme de gestion pour maison de production audio."
+  },
   "auth": {
     "login": {
       "title": "Connexion",
@@ -25,5 +28,100 @@
     "language": "Langue",
     "loading": "Chargement...",
     "coming_soon": "Module à venir dans une prochaine phase."
+  },
+  "clients": {
+    "add": "Nouveau client",
+    "search_placeholder": "Rechercher un client...",
+    "all_segments": "Tous les segments",
+    "empty": "Aucun client trouvé.",
+    "total_suffix": "client(s)",
+    "segment": {
+      "ARTIST": "Artiste",
+      "LABEL": "Label",
+      "ADVERTISING_AGENCY": "Agence pub",
+      "COMPANY": "Entreprise",
+      "INSTITUTION": "Institution",
+      "OTHER": "Autre"
+    },
+    "table": {
+      "name": "Nom",
+      "segment": "Segment",
+      "contact": "Contact",
+      "projects": "Projets",
+      "reliability": "Fiabilité",
+      "actions": "Actions"
+    },
+    "form": {
+      "create_title": "Nouveau client",
+      "edit_title": "Modifier le client",
+      "name": "Nom",
+      "name_error": "Le nom doit contenir entre 2 et 200 caractères.",
+      "segment": "Segment",
+      "email": "E-mail",
+      "email_error": "Adresse e-mail invalide.",
+      "phone": "Téléphone",
+      "phone_error": "Le téléphone doit être au format +261 suivi de 9 chiffres.",
+      "address": "Adresse",
+      "notes": "Notes",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "error": "Une erreur est survenue lors de l'enregistrement."
+    }
+  },
+  "projects": {
+    "add": "Nouveau projet",
+    "search_placeholder": "Rechercher un projet...",
+    "all_statuses": "Tous les statuts",
+    "empty": "Aucun projet trouvé.",
+    "total_suffix": "projet(s)",
+    "status": {
+      "QUOTE": "Devis",
+      "VALIDATED": "Validé",
+      "IN_PROGRESS": "En cours",
+      "REVIEW": "Révision",
+      "DELIVERED": "Livré",
+      "INVOICED": "Facturé",
+      "ARCHIVED": "Archivé"
+    },
+    "service_type": {
+      "RECORDING": "Enregistrement",
+      "MIXING": "Mixage",
+      "MASTERING": "Mastering",
+      "POST_PRODUCTION": "Post-production",
+      "VOICE_OVER": "Voix off",
+      "EQUIPMENT_RENTAL": "Location matériel",
+      "LIVE_EVENT": "Prestation live",
+      "OTHER": "Autre"
+    },
+    "table": {
+      "reference": "Référence",
+      "title": "Titre",
+      "client": "Client",
+      "service_type": "Type de service",
+      "status": "Statut",
+      "actions": "Actions"
+    },
+    "form": {
+      "create_title": "Nouveau projet",
+      "edit_title": "Modifier le projet",
+      "title": "Titre",
+      "title_error": "Le titre doit contenir entre 2 et 200 caractères.",
+      "client": "Client",
+      "client_placeholder": "Sélectionner un client",
+      "client_error": "Le client est obligatoire.",
+      "service_type": "Type de service",
+      "description": "Description",
+      "budget": "Budget",
+      "currency": "Devise",
+      "start_date": "Date de début",
+      "due_date": "Date d'échéance",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "error": "Une erreur est survenue lors de l'enregistrement.",
+      "workflow": "Workflow",
+      "move_to": "Passer à",
+      "no_transition": "Aucune transition disponible depuis ce statut.",
+      "transition_error": "Cette transition n'est pas autorisée pour votre rôle."
+    }
   }
 }

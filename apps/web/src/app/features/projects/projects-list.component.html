@@ -1,0 +1,90 @@
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+  <div class="flex items-center gap-2">
+    <gs-icon name="projects" [size]="22" class="text-gs-blue" />
+    <h2 class="font-display text-2xl font-semibold">{{ 'nav.projects' | translate }}</h2>
+  </div>
+  <a
+    routerLink="/projects/new"
+    class="inline-flex items-center gap-2 rounded-md bg-gs-blue text-gs-black font-semibold px-4 py-2 text-sm hover:opacity-90 transition-opacity w-fit"
+  >
+    <gs-icon name="add" [size]="16" />
+    {{ 'projects.add' | translate }}
+  </a>
+</div>
+
+<div class="flex flex-col sm:flex-row gap-3 mb-4">
+  <div class="relative flex-1">
+    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gs-light/40">
+      <gs-icon name="search" [size]="16" />
+    </span>
+    <input
+      type="text"
+      [(ngModel)]="search"
+      (ngModelChange)="load()"
+      [placeholder]="'projects.search_placeholder' | translate"
+      class="w-full rounded-md bg-gs-dark-gray border border-white/10 pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    />
+  </div>
+  <select
+    [(ngModel)]="statusFilter"
+    (ngModelChange)="load()"
+    class="rounded-md bg-gs-dark-gray border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+  >
+    <option value="">{{ 'projects.all_statuses' | translate }}</option>
+    @for (status of statuses; track status) {
+      <option [value]="status">{{ ('projects.status.' + status) | translate }}</option>
+    }
+  </select>
+</div>
+
+<div class="bg-gs-dark-gray border border-white/5 rounded-xl overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="text-left text-gs-light/50 border-b border-white/5">
+        <th class="px-4 py-3 font-medium">{{ 'projects.table.reference' | translate }}</th>
+        <th class="px-4 py-3 font-medium">{{ 'projects.table.title' | translate }}</th>
+        <th class="px-4 py-3 font-medium hidden md:table-cell">{{ 'projects.table.client' | translate }}</th>
+        <th class="px-4 py-3 font-medium hidden lg:table-cell">{{ 'projects.table.service_type' | translate }}</th>
+        <th class="px-4 py-3 font-medium">{{ 'projects.table.status' | translate }}</th>
+        <th class="px-4 py-3 font-medium text-right">{{ 'projects.table.actions' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (project of projects(); track project.id) {
+        <tr class="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+          <td class="px-4 py-3 font-mono text-xs text-gs-light/70">{{ project.reference }}</td>
+          <td class="px-4 py-3">
+            <a [routerLink]="['/projects', project.id]" class="font-medium hover:text-gs-blue">{{ project.title }}</a>
+          </td>
+          <td class="px-4 py-3 text-gs-light/70 hidden md:table-cell">{{ project.client.name }}</td>
+          <td class="px-4 py-3 text-gs-light/70 hidden lg:table-cell">
+            {{ ('projects.service_type.' + project.serviceType) | translate }}
+          </td>
+          <td class="px-4 py-3">
+            <span class="text-xs px-2 py-1 rounded-full" [class]="statusBadgeClass(project.status)">
+              {{ ('projects.status.' + project.status) | translate }}
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center justify-end gap-2">
+              <a [routerLink]="['/projects', project.id]" class="text-gs-light/60 hover:text-gs-blue">
+                <gs-icon name="edit" [size]="16" />
+              </a>
+              <button type="button" class="text-gs-light/60 hover:text-gs-orange" (click)="remove(project)">
+                <gs-icon name="delete" [size]="16" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="px-4 py-8 text-center text-gs-light/50">
+            {{ 'projects.empty' | translate }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<p class="text-xs text-gs-light/40 mt-3">{{ total() }} {{ 'projects.total_suffix' | translate }}</p>

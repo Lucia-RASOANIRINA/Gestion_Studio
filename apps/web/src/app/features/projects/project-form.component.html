@@ -1,0 +1,152 @@
+<div class="flex items-center gap-2 mb-6">
+  <a routerLink="/projects" class="text-gs-light/60 hover:text-gs-blue">
+    <gs-icon name="back" [size]="20" />
+  </a>
+  <h2 class="font-display text-2xl font-semibold">
+    {{ (projectId() ? 'projects.form.edit_title' : 'projects.form.create_title') | translate }}
+  </h2>
+  @if (currentStatus(); as status) {
+    <span class="text-xs px-2 py-1 rounded-full ml-2" [class]="statusBadgeClass(status)">
+      {{ ('projects.status.' + status) | translate }}
+    </span>
+  }
+</div>
+
+@if (projectId()) {
+  <div class="max-w-2xl bg-gs-dark-gray border border-white/5 rounded-xl p-6 mb-4">
+    <p class="text-sm text-gs-light/60 mb-3">{{ 'projects.form.workflow' | translate }}</p>
+    <div class="flex flex-wrap gap-2">
+      @for (status of nextStatuses; track status) {
+        <button
+          type="button"
+          (click)="transitionTo(status)"
+          class="text-xs px-3 py-1.5 rounded-md border border-gs-blue text-gs-blue hover:bg-gs-blue hover:text-gs-black transition-colors"
+        >
+          {{ 'projects.form.move_to' | translate }} {{ ('projects.status.' + status) | translate }}
+        </button>
+      } @empty {
+        <span class="text-xs text-gs-light/40">{{ 'projects.form.no_transition' | translate }}</span>
+      }
+    </div>
+    @if (transitionError(); as errorKey) {
+      <p class="text-gs-orange text-xs mt-3">{{ errorKey | translate }}</p>
+    }
+  </div>
+}
+
+<form
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+  class="max-w-2xl bg-gs-dark-gray border border-white/5 rounded-xl p-6 space-y-4"
+>
+  <div>
+    <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.title' | translate }}</label>
+    <input
+      type="text"
+      formControlName="title"
+      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    />
+    @if (form.controls.title.invalid && form.controls.title.touched) {
+      <p class="text-gs-orange text-xs mt-1">{{ 'projects.form.title_error' | translate }}</p>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.client' | translate }}</label>
+      <select
+        formControlName="clientId"
+        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      >
+        <option value="" disabled>{{ 'projects.form.client_placeholder' | translate }}</option>
+        @for (client of clients(); track client.id) {
+          <option [value]="client.id">{{ client.name }}</option>
+        }
+      </select>
+      @if (form.controls.clientId.invalid && form.controls.clientId.touched) {
+        <p class="text-gs-orange text-xs mt-1">{{ 'projects.form.client_error' | translate }}</p>
+      }
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.service_type' | translate }}</label>
+      <select
+        formControlName="serviceType"
+        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      >
+        @for (type of serviceTypes; track type) {
+          <option [value]="type">{{ ('projects.service_type.' + type) | translate }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.description' | translate }}</label>
+    <textarea
+      formControlName="description"
+      rows="3"
+      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    ></textarea>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.budget' | translate }}</label>
+      <input
+        type="number"
+        min="0"
+        formControlName="budgetAmount"
+        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      />
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.currency' | translate }}</label>
+      <select
+        formControlName="budgetCurrency"
+        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      >
+        @for (currency of currencies; track currency) {
+          <option [value]="currency">{{ currency }}</option>
+        }
+      </select>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.start_date' | translate }}</label>
+      <input
+        type="date"
+        formControlName="startDate"
+        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      />
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.due_date' | translate }}</label>
+      <input
+        type="date"
+        formControlName="dueDate"
+        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      />
+    </div>
+  </div>
+
+  @if (serverError(); as errorKey) {
+    <p class="text-gs-orange text-sm">{{ errorKey | translate }}</p>
+  }
+
+  <div class="flex items-center gap-3 pt-2">
+    <button
+      type="submit"
+      [disabled]="saving()"
+      class="inline-flex items-center gap-2 rounded-md bg-gs-blue text-gs-black font-semibold px-4 py-2 text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
+    >
+      <gs-icon name="check" [size]="16" />
+      {{ 'projects.form.save' | translate }}
+    </button>
+    <a routerLink="/projects" class="text-sm text-gs-light/60 hover:text-gs-light">
+      {{ 'projects.form.cancel' | translate }}
+    </a>
+  </div>
+</form>

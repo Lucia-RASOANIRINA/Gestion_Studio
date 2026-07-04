@@ -1,8 +1,10 @@
 import { Component, input } from "@angular/core";
 import {
+  LucideArrowLeft,
   LucideBarChart3,
   LucideBoxes,
   LucideCalendarDays,
+  LucideCheck,
   LucideFolderKanban,
   LucideGlobe,
   LucideLayoutDashboard,
@@ -11,8 +13,12 @@ import {
   LucideMail,
   LucideMenu,
   LucideMusic,
+  LucidePencil,
+  LucidePlus,
   LucideReceipt,
+  LucideSearch,
   LucideSettings,
+  LucideTrash2,
   LucideUsers,
   LucideX,
 } from "@lucide/angular";
@@ -32,7 +38,13 @@ export type IconName =
   | "language"
   | "mail"
   | "lock"
-  | "logo";
+  | "logo"
+  | "search"
+  | "add"
+  | "edit"
+  | "delete"
+  | "back"
+  | "check";
 
 @Component({
   selector: "gs-icon",
@@ -53,6 +65,12 @@ export type IconName =
     LucideMail,
     LucideLock,
     LucideMusic,
+    LucideSearch,
+    LucidePlus,
+    LucidePencil,
+    LucideTrash2,
+    LucideArrowLeft,
+    LucideCheck,
   ],
   template: `
     @switch (name()) {
@@ -100,6 +118,24 @@ export type IconName =
       }
       @case ("logo") {
         <svg lucideMusic [size]="size()"></svg>
+      }
+      @case ("search") {
+        <svg lucideSearch [size]="size()"></svg>
+      }
+      @case ("add") {
+        <svg lucidePlus [size]="size()"></svg>
+      }
+      @case ("edit") {
+        <svg lucidePencil [size]="size()"></svg>
+      }
+      @case ("delete") {
+        <svg lucideTrash2 [size]="size()"></svg>
+      }
+      @case ("back") {
+        <svg lucideArrowLeft [size]="size()"></svg>
+      }
+      @case ("check") {
+        <svg lucideCheck [size]="size()"></svg>
       }
     }
   `,

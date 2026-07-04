@@ -1,0 +1,96 @@
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+  <div class="flex items-center gap-2">
+    <gs-icon name="clients" [size]="22" class="text-gs-blue" />
+    <h2 class="font-display text-2xl font-semibold">{{ 'nav.clients' | translate }}</h2>
+  </div>
+  <a
+    routerLink="/clients/new"
+    class="inline-flex items-center gap-2 rounded-md bg-gs-blue text-gs-black font-semibold px-4 py-2 text-sm hover:opacity-90 transition-opacity w-fit"
+  >
+    <gs-icon name="add" [size]="16" />
+    {{ 'clients.add' | translate }}
+  </a>
+</div>
+
+<div class="flex flex-col sm:flex-row gap-3 mb-4">
+  <div class="relative flex-1">
+    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gs-light/40">
+      <gs-icon name="search" [size]="16" />
+    </span>
+    <input
+      type="text"
+      [(ngModel)]="search"
+      (ngModelChange)="load()"
+      [placeholder]="'clients.search_placeholder' | translate"
+      class="w-full rounded-md bg-gs-dark-gray border border-white/10 pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    />
+  </div>
+  <select
+    [(ngModel)]="segmentFilter"
+    (ngModelChange)="load()"
+    class="rounded-md bg-gs-dark-gray border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+  >
+    <option value="">{{ 'clients.all_segments' | translate }}</option>
+    @for (segment of segments; track segment) {
+      <option [value]="segment">{{ ('clients.segment.' + segment) | translate }}</option>
+    }
+  </select>
+</div>
+
+<div class="bg-gs-dark-gray border border-white/5 rounded-xl overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="text-left text-gs-light/50 border-b border-white/5">
+        <th class="px-4 py-3 font-medium">{{ 'clients.table.name' | translate }}</th>
+        <th class="px-4 py-3 font-medium">{{ 'clients.table.segment' | translate }}</th>
+        <th class="px-4 py-3 font-medium hidden md:table-cell">{{ 'clients.table.contact' | translate }}</th>
+        <th class="px-4 py-3 font-medium hidden lg:table-cell">{{ 'clients.table.projects' | translate }}</th>
+        <th class="px-4 py-3 font-medium">{{ 'clients.table.reliability' | translate }}</th>
+        <th class="px-4 py-3 font-medium text-right">{{ 'clients.table.actions' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (client of clients(); track client.id) {
+        <tr class="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+          <td class="px-4 py-3">
+            <a [routerLink]="['/clients', client.id, 'edit']" class="font-medium hover:text-gs-blue">{{ client.name }}</a>
+          </td>
+          <td class="px-4 py-3">
+            <span class="text-xs px-2 py-1 rounded-full" [class]="segmentBadgeClass(client.segment)">
+              {{ ('clients.segment.' + client.segment) | translate }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-gs-light/70 hidden md:table-cell">
+            <div>{{ client.email || '—' }}</div>
+            <div class="text-xs text-gs-light/50">{{ client.phone || '—' }}</div>
+          </td>
+          <td class="px-4 py-3 text-gs-light/70 hidden lg:table-cell">{{ client._count?.projects ?? 0 }}</td>
+          <td class="px-4 py-3">
+            <span [class.text-gs-green]="client.reliabilityScore >= 80"
+                  [class.text-gs-orange]="client.reliabilityScore < 80">
+              {{ client.reliabilityScore }}%
+            </span>
+          </td>
+          <td class="px-4 py-3">
+            <div class="flex items-center justify-end gap-2">
+              <a [routerLink]="['/clients', client.id, 'edit']" class="text-gs-light/60 hover:text-gs-blue">
+                <gs-icon name="edit" [size]="16" />
+              </a>
+              <button type="button" class="text-gs-light/60 hover:text-gs-orange" (click)="remove(client)">
+                <gs-icon name="delete" [size]="16" />
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6" class="px-4 py-8 text-center text-gs-light/50">
+            {{ 'clients.empty' | translate }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<p class="text-xs text-gs-light/40 mt-3">{{ total() }} {{ 'clients.total_suffix' | translate }}</p>
