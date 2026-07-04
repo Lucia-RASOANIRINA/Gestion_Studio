@@ -1,4 +1,12 @@
-import { PermissionAction, PermissionModule, PrismaClient } from "@prisma/client";
+import {
+  ClientSegment,
+  Currency,
+  PermissionAction,
+  PermissionModule,
+  PrismaClient,
+  ProjectStatus,
+  ServiceType,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -157,6 +165,203 @@ const DEMO_USERS: DemoUser[] = [
 
 const DEMO_PASSWORD = "ChangeMe123!";
 
+interface DemoClient {
+  key: string;
+  name: string;
+  segment: ClientSegment;
+  email: string;
+  phone: string;
+  address: string;
+  notes: string;
+  reliabilityScore: number;
+}
+
+const DEMO_CLIENTS: DemoClient[] = [
+  {
+    key: "tolotra",
+    name: "Tolotra Andriamahefa",
+    segment: ClientSegment.ARTIST,
+    email: "tolotra.andriamahefa@example.mg",
+    phone: "+261320000011",
+    address: "Lot II M 12 Ambatobe, Antananarivo",
+    notes: "Artiste solo, style acoustique. Préfère le studio A.",
+    reliabilityScore: 95,
+  },
+  {
+    key: "zaza_orkestra",
+    name: "Zaza Orkestra",
+    segment: ClientSegment.ARTIST,
+    email: "contact@zazaorkestra.mg",
+    phone: "+261320000012",
+    address: "Rue Rainandriamampandry, Antsahavola, Antananarivo",
+    notes: "Groupe de 7 musiciens, sessions live fréquentes.",
+    reliabilityScore: 88,
+  },
+  {
+    key: "mikea_records",
+    name: "Mikea Records",
+    segment: ClientSegment.LABEL,
+    email: "production@mikearecords.mg",
+    phone: "+261320000013",
+    address: "Ankorondrano, Antananarivo",
+    notes: "Label indépendant, plusieurs artistes en coproduction.",
+    reliabilityScore: 92,
+  },
+  {
+    key: "sakay_prod",
+    name: "Sakay Prod",
+    segment: ClientSegment.LABEL,
+    email: "hello@sakayprod.mg",
+    phone: "+261320000014",
+    address: "Analakely, Antananarivo",
+    notes: "Label spécialisé slam et hip-hop malgache.",
+    reliabilityScore: 79,
+  },
+  {
+    key: "saha_communication",
+    name: "Saha Communication",
+    segment: ClientSegment.ADVERTISING_AGENCY,
+    email: "studio@sahacommunication.mg",
+    phone: "+261320000015",
+    address: "Zone Galaxy Andraharo, Antananarivo",
+    notes: "Agence de publicité, commandes de voix off régulières.",
+    reliabilityScore: 85,
+  },
+  {
+    key: "jovena",
+    name: "Jovena Madagascar",
+    segment: ClientSegment.COMPANY,
+    email: "communication@jovena.mg",
+    phone: "+261320000016",
+    address: "Route des Hydrocarbures, Antananarivo",
+    notes: "Entreprise, prestations événementielles annuelles.",
+    reliabilityScore: 97,
+  },
+  {
+    key: "ministere_culture",
+    name: "Ministère de la Culture",
+    segment: ClientSegment.INSTITUTION,
+    email: "communication@culture.gov.mg",
+    phone: "+261320000017",
+    address: "Anosy, Antananarivo",
+    notes: "Institution publique, appels d'offres pour événements culturels.",
+    reliabilityScore: 90,
+  },
+  {
+    key: "dj_rado",
+    name: "DJ Rado",
+    segment: ClientSegment.ARTIST,
+    email: "djrado@example.mg",
+    phone: "+261320000018",
+    address: "Ivandry, Antananarivo",
+    notes: "DJ événementiel, location de matériel fréquente.",
+    reliabilityScore: 70,
+  },
+];
+
+interface DemoProject {
+  clientKey: string;
+  title: string;
+  serviceType: ServiceType;
+  status: ProjectStatus;
+  description: string;
+  budgetAmount: number;
+  budgetCurrency: Currency;
+}
+
+const DEMO_PROJECTS: DemoProject[] = [
+  {
+    clientKey: "tolotra",
+    title: "Enregistrement album acoustique",
+    serviceType: ServiceType.RECORDING,
+    status: ProjectStatus.QUOTE,
+    description: "Enregistrement de 8 titres en studio A.",
+    budgetAmount: 3500000,
+    budgetCurrency: Currency.MGA,
+  },
+  {
+    clientKey: "tolotra",
+    title: "Mixage single 'Fitiavana'",
+    serviceType: ServiceType.MIXING,
+    status: ProjectStatus.VALIDATED,
+    description: "Mixage stéréo pour diffusion radio et streaming.",
+    budgetAmount: 800000,
+    budgetCurrency: Currency.MGA,
+  },
+  {
+    clientKey: "zaza_orkestra",
+    title: "Mastering EP live",
+    serviceType: ServiceType.MASTERING,
+    status: ProjectStatus.IN_PROGRESS,
+    description: "Mastering de l'enregistrement du concert du 12 mai.",
+    budgetAmount: 1200000,
+    budgetCurrency: Currency.MGA,
+  },
+  {
+    clientKey: "mikea_records",
+    title: "Post-production clip 'Tanindrazana'",
+    serviceType: ServiceType.POST_PRODUCTION,
+    status: ProjectStatus.REVIEW,
+    description: "Sound design et habillage sonore du clip vidéo.",
+    budgetAmount: 2100000,
+    budgetCurrency: Currency.MGA,
+  },
+  {
+    clientKey: "saha_communication",
+    title: "Voix off campagne institutionnelle",
+    serviceType: ServiceType.VOICE_OVER,
+    status: ProjectStatus.DELIVERED,
+    description: "Voix off FR/MG pour spot radio 30 secondes.",
+    budgetAmount: 450000,
+    budgetCurrency: Currency.MGA,
+  },
+  {
+    clientKey: "jovena",
+    title: "Location sonorisation séminaire annuel",
+    serviceType: ServiceType.EQUIPMENT_RENTAL,
+    status: ProjectStatus.INVOICED,
+    description: "Location console + enceintes + micros HF pour 200 personnes.",
+    budgetAmount: 1800000,
+    budgetCurrency: Currency.MGA,
+  },
+  {
+    clientKey: "ministere_culture",
+    title: "Prestation live Fête de la Musique",
+    serviceType: ServiceType.LIVE_EVENT,
+    status: ProjectStatus.ARCHIVED,
+    description: "Sonorisation de la scène principale, place du 13 mai.",
+    budgetAmount: 5000000,
+    budgetCurrency: Currency.MGA,
+  },
+  {
+    clientKey: "sakay_prod",
+    title: "Enregistrement mixtape collective",
+    serviceType: ServiceType.RECORDING,
+    status: ProjectStatus.QUOTE,
+    description: "Sessions d'enregistrement pour 6 artistes du label.",
+    budgetAmount: 2600000,
+    budgetCurrency: Currency.MGA,
+  },
+  {
+    clientKey: "dj_rado",
+    title: "Mixage set enregistré",
+    serviceType: ServiceType.MIXING,
+    status: ProjectStatus.IN_PROGRESS,
+    description: "Mixage d'un set live enregistré en discothèque.",
+    budgetAmount: 600000,
+    budgetCurrency: Currency.MGA,
+  },
+  {
+    clientKey: "zaza_orkestra",
+    title: "Mastering album studio",
+    serviceType: ServiceType.MASTERING,
+    status: ProjectStatus.VALIDATED,
+    description: "Mastering final avant distribution digitale.",
+    budgetAmount: 1400000,
+    budgetCurrency: Currency.MGA,
+  },
+];
+
 async function main() {
   const permissionByKey = new Map<string, { id: string }>();
   for (const module of ALL_MODULES) {
@@ -222,10 +427,60 @@ async function main() {
     });
   }
 
+  const producer = await prisma.user.findUnique({ where: { email: "producteur@gestion-studio.mg" } });
+
+  const clientByKey = new Map<string, { id: string }>();
+  for (const demoClient of DEMO_CLIENTS) {
+    const client =
+      (await prisma.client.findFirst({ where: { email: demoClient.email } })) ??
+      (await prisma.client.create({
+        data: {
+          name: demoClient.name,
+          segment: demoClient.segment,
+          email: demoClient.email,
+          phone: demoClient.phone,
+          address: demoClient.address,
+          notes: demoClient.notes,
+          reliabilityScore: demoClient.reliabilityScore,
+          createdById: producer?.id,
+        },
+      }));
+    clientByKey.set(demoClient.key, client);
+  }
+
+  const year = new Date().getFullYear();
+  let projectSequence = 1;
+  for (const demoProject of DEMO_PROJECTS) {
+    const client = clientByKey.get(demoProject.clientKey);
+    if (!client) continue;
+
+    const reference = `PROD-${year}-${projectSequence.toString().padStart(3, "0")}`;
+    projectSequence += 1;
+
+    const existing = await prisma.project.findUnique({ where: { reference } });
+    if (existing) continue;
+
+    await prisma.project.create({
+      data: {
+        reference,
+        title: demoProject.title,
+        serviceType: demoProject.serviceType,
+        status: demoProject.status,
+        description: demoProject.description,
+        budgetAmount: demoProject.budgetAmount,
+        budgetCurrency: demoProject.budgetCurrency,
+        clientId: client.id,
+        createdById: producer?.id,
+      },
+    });
+  }
+
   console.log("Seed terminé. Comptes de démonstration (mot de passe commun : ChangeMe123!) :");
   for (const demoUser of DEMO_USERS) {
     console.log(`  - ${demoUser.email} (${demoUser.roleName})`);
   }
+  console.log(`Clients de démonstration : ${DEMO_CLIENTS.length}`);
+  console.log(`Projets de démonstration : ${DEMO_PROJECTS.length}`);
 }
 
 main()

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { type SignOptions } from "jsonwebtoken";
 import { prisma } from "../../config/prisma";
 import { env } from "../../config/env";
 import { AppError } from "../../common/errors/AppError";
@@ -16,10 +16,10 @@ function hashToken(token: string) {
 
 async function issueTokens(userId: string, roles: string[]) {
   const accessToken = jwt.sign({ sub: userId, roles }, env.jwt.accessSecret, {
-    expiresIn: env.jwt.accessExpiresIn,
+    expiresIn: env.jwt.accessExpiresIn as SignOptions["expiresIn"],
   });
   const refreshToken = jwt.sign({ sub: userId }, env.jwt.refreshSecret, {
-    expiresIn: env.jwt.refreshExpiresIn,
+    expiresIn: env.jwt.refreshExpiresIn as SignOptions["expiresIn"],
   });
 
   await prisma.refreshToken.create({

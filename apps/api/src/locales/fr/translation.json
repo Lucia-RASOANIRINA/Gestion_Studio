@@ -6,7 +6,8 @@
     "validation_failed": "Les données envoyées sont invalides.",
     "invalid_credentials": "Identifiants invalides.",
     "account_locked": "Compte verrouillé suite à de trop nombreuses tentatives. Réessayez plus tard.",
-    "internal_error": "Une erreur interne est survenue."
+    "internal_error": "Une erreur interne est survenue.",
+    "invalid_project_transition": "Cette transition de statut n'est pas autorisée."
   },
   "auth": {
     "login_success": "Connexion réussie.",

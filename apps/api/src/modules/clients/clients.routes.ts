@@ -2,13 +2,46 @@ import { Router } from "express";
 import { PermissionAction, PermissionModule } from "@prisma/client";
 import { authenticate } from "../../common/middleware/authenticate";
 import { requirePermission } from "../../common/rbac/requirePermission";
-import { listClientsHandler } from "./clients.controller";
+import { asyncHandler } from "../../common/middleware/asyncHandler";
+import { validateBody, validateQuery } from "../../common/middleware/validate";
+import {
+  createClientHandler,
+  deleteClientHandler,
+  getClientHandler,
+  listClientsHandler,
+  updateClientHandler,
+} from "./clients.controller";
+import { createClientSchema, listClientsQuerySchema, updateClientSchema } from "./clients.validation";
 
 export const clientsRouter = Router();
 
 clientsRouter.use(authenticate);
+
 clientsRouter.get(
   "/",
   requirePermission(PermissionModule.CLIENTS, PermissionAction.READ),
-  listClientsHandler
+  validateQuery(listClientsQuerySchema),
+  asyncHandler(listClientsHandler)
+);
+clientsRouter.get(
+  "/:id",
+  requirePermission(PermissionModule.CLIENTS, PermissionAction.READ),
+  asyncHandler(getClientHandler)
+);
+clientsRouter.post(
+  "/",
+  requirePermission(PermissionModule.CLIENTS, PermissionAction.CREATE),
+  validateBody(createClientSchema),
+  asyncHandler(createClientHandler)
+);
+clientsRouter.put(
+  "/:id",
+  requirePermission(PermissionModule.CLIENTS, PermissionAction.UPDATE),
+  validateBody(updateClientSchema),
+  asyncHandler(updateClientHandler)
+);
+clientsRouter.delete(
+  "/:id",
+  requirePermission(PermissionModule.CLIENTS, PermissionAction.DELETE),
+  asyncHandler(deleteClientHandler)
 );

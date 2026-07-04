@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import type { PermissionAction, PermissionModule } from "@prisma/client";
-import { prisma } from "../../config/prisma";
 import { AppError } from "../errors/AppError";
+import { hasPermission } from "./hasPermission";
 
 /**
  * Vérifie la permission en interrogeant la matrice rôle x permission en base
@@ -14,14 +14,8 @@ export function requirePermission(module: PermissionModule, action: PermissionAc
       return next(AppError.unauthorized());
     }
 
-    const count = await prisma.rolePermission.count({
-      where: {
-        role: { users: { some: { userId: req.user.sub } } },
-        permission: { module, action },
-      },
-    });
-
-    if (count === 0) {
+    const allowed = await hasPermission(req.user.sub, module, action);
+    if (!allowed) {
       return next(AppError.forbidden());
     }
 

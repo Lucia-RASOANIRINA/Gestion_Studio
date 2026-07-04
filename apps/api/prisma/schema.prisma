@@ -1,6 +1,7 @@
-// Schéma Prisma — Phase 1 (Fondations) : utilisateurs, rôles, permissions, audit.
-// Les modèles des phases suivantes (clients, projets, planning, ressources,
-// facturation, reporting) seront ajoutés phase par phase, avec leurs migrations dédiées.
+// Schéma Prisma — fondations (utilisateurs, rôles, permissions, audit),
+// Clients & Contacts (phase 2) et Projets & Services (phase 3).
+// Les modèles des phases suivantes (planning, ressources, facturation, reporting)
+// seront ajoutés phase par phase, avec leurs migrations dédiées.
 
 generator client {
   provider = "prisma-client-js"
@@ -48,6 +49,8 @@ model User {
   roles        UserRole[]
   refreshTokens RefreshToken[]
   auditLogs    AuditLog[]
+  createdClients  Client[]
+  createdProjects Project[]
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -134,4 +137,85 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@map("audit_logs")
+}
+
+enum ClientSegment {
+  ARTIST
+  LABEL
+  ADVERTISING_AGENCY
+  COMPANY
+  INSTITUTION
+  OTHER
+}
+
+model Client {
+  id               String        @id @default(uuid())
+  name             String
+  segment          ClientSegment @default(OTHER)
+  email            String?
+  phone            String?
+  address          String?
+  notes            String?
+  reliabilityScore Int           @default(100)
+
+  createdById      String?
+  createdBy        User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  projects         Project[]
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@map("clients")
+}
+
+enum ServiceType {
+  RECORDING
+  MIXING
+  MASTERING
+  POST_PRODUCTION
+  VOICE_OVER
+  EQUIPMENT_RENTAL
+  LIVE_EVENT
+  OTHER
+}
+
+enum ProjectStatus {
+  QUOTE
+  VALIDATED
+  IN_PROGRESS
+  REVIEW
+  DELIVERED
+  INVOICED
+  ARCHIVED
+}
+
+enum Currency {
+  MGA
+  EUR
+  USD
+}
+
+model Project {
+  id             String        @id @default(uuid())
+  reference      String        @unique
+  title          String
+  serviceType    ServiceType
+  status         ProjectStatus @default(QUOTE)
+  description    String?
+  budgetAmount   Decimal?      @db.Decimal(14, 2)
+  budgetCurrency Currency      @default(MGA)
+  startDate      DateTime?
+  dueDate        DateTime?
+
+  clientId       String
+  client         Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  createdById    String?
+  createdBy      User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@map("projects")
 }

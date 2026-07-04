@@ -6,7 +6,8 @@
     "validation_failed": "The submitted data is invalid.",
     "invalid_credentials": "Invalid credentials.",
     "account_locked": "Account locked after too many failed attempts. Please try again later.",
-    "internal_error": "An internal error occurred."
+    "internal_error": "An internal error occurred.",
+    "invalid_project_transition": "This status transition is not allowed."
   },
   "auth": {
     "login_success": "Login successful.",
