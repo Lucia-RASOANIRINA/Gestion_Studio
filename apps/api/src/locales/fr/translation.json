@@ -7,7 +7,11 @@
     "invalid_credentials": "Identifiants invalides.",
     "account_locked": "Compte verrouillé suite à de trop nombreuses tentatives. Réessayez plus tard.",
     "internal_error": "Une erreur interne est survenue.",
-    "invalid_project_transition": "Cette transition de statut n'est pas autorisée."
+    "invalid_project_transition": "Cette transition de statut n'est pas autorisée.",
+    "conflict": "Cette action entre en conflit avec une ressource existante.",
+    "booking_conflict": "Ce créneau est en conflit avec une ou plusieurs réservations existantes (même studio ou même ingénieur).",
+    "invalid_booking_duration": "La durée de la réservation doit être un multiple de 15 minutes.",
+    "booking_in_past": "Une réservation ne peut pas être prise dans le passé."
   },
   "auth": {
     "login_success": "Connexion réussie.",

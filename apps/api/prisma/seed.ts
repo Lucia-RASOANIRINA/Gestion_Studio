@@ -1,4 +1,5 @@
 import {
+  BookingType,
   ClientSegment,
   Currency,
   PermissionAction,
@@ -6,6 +7,7 @@ import {
   PrismaClient,
   ProjectStatus,
   ServiceType,
+  StudioRoom,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -260,6 +262,7 @@ const DEMO_CLIENTS: DemoClient[] = [
 ];
 
 interface DemoProject {
+  key: string;
   clientKey: string;
   title: string;
   serviceType: ServiceType;
@@ -271,6 +274,7 @@ interface DemoProject {
 
 const DEMO_PROJECTS: DemoProject[] = [
   {
+    key: "tolotra_recording",
     clientKey: "tolotra",
     title: "Enregistrement album acoustique",
     serviceType: ServiceType.RECORDING,
@@ -280,6 +284,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     budgetCurrency: Currency.MGA,
   },
   {
+    key: "tolotra_mixing",
     clientKey: "tolotra",
     title: "Mixage single 'Fitiavana'",
     serviceType: ServiceType.MIXING,
@@ -289,6 +294,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     budgetCurrency: Currency.MGA,
   },
   {
+    key: "zaza_mastering_ep",
     clientKey: "zaza_orkestra",
     title: "Mastering EP live",
     serviceType: ServiceType.MASTERING,
@@ -298,6 +304,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     budgetCurrency: Currency.MGA,
   },
   {
+    key: "mikea_postproduction",
     clientKey: "mikea_records",
     title: "Post-production clip 'Tanindrazana'",
     serviceType: ServiceType.POST_PRODUCTION,
@@ -307,6 +314,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     budgetCurrency: Currency.MGA,
   },
   {
+    key: "saha_voiceover",
     clientKey: "saha_communication",
     title: "Voix off campagne institutionnelle",
     serviceType: ServiceType.VOICE_OVER,
@@ -316,6 +324,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     budgetCurrency: Currency.MGA,
   },
   {
+    key: "jovena_rental",
     clientKey: "jovena",
     title: "Location sonorisation séminaire annuel",
     serviceType: ServiceType.EQUIPMENT_RENTAL,
@@ -325,6 +334,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     budgetCurrency: Currency.MGA,
   },
   {
+    key: "ministere_live",
     clientKey: "ministere_culture",
     title: "Prestation live Fête de la Musique",
     serviceType: ServiceType.LIVE_EVENT,
@@ -334,6 +344,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     budgetCurrency: Currency.MGA,
   },
   {
+    key: "sakay_recording",
     clientKey: "sakay_prod",
     title: "Enregistrement mixtape collective",
     serviceType: ServiceType.RECORDING,
@@ -343,6 +354,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     budgetCurrency: Currency.MGA,
   },
   {
+    key: "djrado_mixing",
     clientKey: "dj_rado",
     title: "Mixage set enregistré",
     serviceType: ServiceType.MIXING,
@@ -352,6 +364,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     budgetCurrency: Currency.MGA,
   },
   {
+    key: "zaza_mastering_album",
     clientKey: "zaza_orkestra",
     title: "Mastering album studio",
     serviceType: ServiceType.MASTERING,
@@ -450,6 +463,7 @@ async function main() {
 
   const year = new Date().getFullYear();
   let projectSequence = 1;
+  const projectByKey = new Map<string, { id: string }>();
   for (const demoProject of DEMO_PROJECTS) {
     const client = clientByKey.get(demoProject.clientKey);
     if (!client) continue;
@@ -457,19 +471,128 @@ async function main() {
     const reference = `PROD-${year}-${projectSequence.toString().padStart(3, "0")}`;
     projectSequence += 1;
 
-    const existing = await prisma.project.findUnique({ where: { reference } });
-    if (existing) continue;
+    const project =
+      (await prisma.project.findUnique({ where: { reference } })) ??
+      (await prisma.project.create({
+        data: {
+          reference,
+          title: demoProject.title,
+          serviceType: demoProject.serviceType,
+          status: demoProject.status,
+          description: demoProject.description,
+          budgetAmount: demoProject.budgetAmount,
+          budgetCurrency: demoProject.budgetCurrency,
+          clientId: client.id,
+          createdById: producer?.id,
+        },
+      }));
+    projectByKey.set(demoProject.key, project);
+  }
 
-    await prisma.project.create({
+  const engineer = await prisma.user.findUnique({ where: { email: "ingenieur@gestion-studio.mg" } });
+  const freelancer = await prisma.user.findUnique({ where: { email: "freelance@gestion-studio.mg" } });
+
+  function inDays(days: number, hour: number, minute = 0): Date {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    date.setHours(hour, minute, 0, 0);
+    return date;
+  }
+
+  interface DemoBooking {
+    studio: StudioRoom;
+    type: BookingType;
+    title: string;
+    startAt: Date;
+    endAt: Date;
+    projectKey?: string;
+    engineerId?: string;
+    notes?: string;
+  }
+
+  const DEMO_BOOKINGS: DemoBooking[] = [
+    {
+      studio: StudioRoom.STUDIO_A,
+      type: BookingType.SESSION,
+      title: "Session enregistrement — Tolotra Andriamahefa",
+      startAt: inDays(1, 10, 0),
+      endAt: inDays(1, 12, 0),
+      projectKey: "tolotra_recording",
+      engineerId: engineer?.id,
+    },
+    {
+      studio: StudioRoom.STUDIO_A,
+      type: BookingType.SESSION,
+      title: "Mixage single 'Fitiavana'",
+      startAt: inDays(2, 14, 0),
+      endAt: inDays(2, 15, 30),
+      projectKey: "tolotra_mixing",
+      engineerId: engineer?.id,
+    },
+    {
+      studio: StudioRoom.STUDIO_B,
+      type: BookingType.SESSION,
+      title: "Mastering EP live — Zaza Orkestra",
+      startAt: inDays(1, 9, 0),
+      endAt: inDays(1, 10, 0),
+      projectKey: "zaza_mastering_ep",
+      engineerId: engineer?.id,
+    },
+    {
+      studio: StudioRoom.STUDIO_B,
+      type: BookingType.UNAVAILABILITY,
+      title: "Maintenance console de mixage",
+      startAt: inDays(2, 8, 0),
+      endAt: inDays(2, 13, 0),
+      notes: "Intervention technicien — console indisponible.",
+    },
+    {
+      studio: StudioRoom.STUDIO_C,
+      type: BookingType.SESSION,
+      title: "Post-production clip 'Tanindrazana'",
+      startAt: inDays(3, 16, 0),
+      endAt: inDays(3, 17, 0),
+      projectKey: "mikea_postproduction",
+      engineerId: engineer?.id,
+    },
+    {
+      studio: StudioRoom.MOBILE,
+      type: BookingType.SESSION,
+      title: "Sonorisation séminaire — Jovena Madagascar",
+      startAt: inDays(4, 18, 0),
+      endAt: inDays(4, 21, 0),
+      projectKey: "jovena_rental",
+      engineerId: engineer?.id,
+    },
+    {
+      studio: StudioRoom.MOBILE,
+      type: BookingType.SESSION,
+      title: "Mixage set enregistré — DJ Rado",
+      startAt: inDays(6, 15, 0),
+      endAt: inDays(6, 16, 30),
+      projectKey: "djrado_mixing",
+      engineerId: freelancer?.id,
+    },
+  ];
+
+  for (const demoBooking of DEMO_BOOKINGS) {
+    const alreadyExists = await prisma.booking.findFirst({
+      where: { title: demoBooking.title, startAt: demoBooking.startAt },
+    });
+    if (alreadyExists) continue;
+
+    const project = demoBooking.projectKey ? projectByKey.get(demoBooking.projectKey) : undefined;
+
+    await prisma.booking.create({
       data: {
-        reference,
-        title: demoProject.title,
-        serviceType: demoProject.serviceType,
-        status: demoProject.status,
-        description: demoProject.description,
-        budgetAmount: demoProject.budgetAmount,
-        budgetCurrency: demoProject.budgetCurrency,
-        clientId: client.id,
+        studio: demoBooking.studio,
+        type: demoBooking.type,
+        title: demoBooking.title,
+        startAt: demoBooking.startAt,
+        endAt: demoBooking.endAt,
+        projectId: project?.id,
+        engineerId: demoBooking.engineerId,
+        notes: demoBooking.notes,
         createdById: producer?.id,
       },
     });
@@ -481,6 +604,7 @@ async function main() {
   }
   console.log(`Clients de démonstration : ${DEMO_CLIENTS.length}`);
   console.log(`Projets de démonstration : ${DEMO_PROJECTS.length}`);
+  console.log(`Réservations de démonstration : ${DEMO_BOOKINGS.length}`);
 }
 
 main()

@@ -7,7 +7,11 @@
     "invalid_credentials": "Invalid credentials.",
     "account_locked": "Account locked after too many failed attempts. Please try again later.",
     "internal_error": "An internal error occurred.",
-    "invalid_project_transition": "This status transition is not allowed."
+    "invalid_project_transition": "This status transition is not allowed.",
+    "conflict": "This action conflicts with an existing resource.",
+    "booking_conflict": "This time slot conflicts with one or more existing bookings (same studio or same engineer).",
+    "invalid_booking_duration": "Booking duration must be a multiple of 15 minutes.",
+    "booking_in_past": "A booking cannot be scheduled in the past."
   },
   "auth": {
     "login_success": "Login successful.",

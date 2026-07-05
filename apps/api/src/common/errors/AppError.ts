@@ -23,4 +23,8 @@ export class AppError extends Error {
   static badRequest(messageKey = "errors.validation_failed", details?: unknown) {
     return new AppError(400, messageKey, details);
   }
+
+  static conflict(messageKey = "errors.conflict", details?: unknown) {
+    return new AppError(409, messageKey, details);
+  }
 }

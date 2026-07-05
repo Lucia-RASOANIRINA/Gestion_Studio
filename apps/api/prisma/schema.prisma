@@ -51,6 +51,8 @@ model User {
   auditLogs    AuditLog[]
   createdClients  Client[]
   createdProjects Project[]
+  createdBookings Booking[] @relation("BookingCreatedBy")
+  engineerBookings Booking[] @relation("BookingEngineer")
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -217,5 +219,46 @@ model Project {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
+  bookings       Booking[]
+
   @@map("projects")
+}
+
+enum StudioRoom {
+  STUDIO_A
+  STUDIO_B
+  STUDIO_C
+  MOBILE
+}
+
+enum BookingType {
+  SESSION
+  UNAVAILABILITY
+}
+
+/// Réservations de studio — la détection de conflits (même studio ou même
+/// ingénieur sur une plage horaire qui se chevauche) est appliquée en service,
+/// jamais uniquement côté frontend.
+model Booking {
+  id        String      @id @default(uuid())
+  studio    StudioRoom
+  type      BookingType @default(SESSION)
+  title     String
+  startAt   DateTime
+  endAt     DateTime
+  notes     String?
+
+  projectId String?
+  project   Project?    @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  engineerId String?
+  engineer   User?      @relation("BookingEngineer", fields: [engineerId], references: [id], onDelete: SetNull)
+
+  createdById String?
+  createdBy   User?     @relation("BookingCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("bookings")
 }
