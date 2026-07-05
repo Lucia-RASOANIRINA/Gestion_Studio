@@ -18,10 +18,13 @@ Toutes les évolutions notables du projet sont documentées ici.
 - **Module Clients & Contacts (phase 2) complet** : modèle Prisma `Client`, endpoints CRUD avec validation (téléphone malgache, e-mail), recherche/filtre/pagination, pages Angular (liste, création, édition) avec formulaires réactifs et messages d'erreur localisés.
 - **Module Projets & Services (phase 3) complet** : modèle Prisma `Project`, numérotation automatique (`PROD-AAAA-NNN`), machine à états du workflow (Devis → Validé → En cours → Révision → Livré → Facturé → Archivé) avec tests unitaires et permission dédiée pour la validation, endpoints CRUD + transition de statut, pages Angular (liste, création/édition avec actions de workflow).
 - 8 clients et 10 projets de démonstration supplémentaires (données réalistes, tous statuts et types de service représentés).
+- **Module Planning & Réservations (phase 4) complet** : modèle Prisma `Booking` (studio, type session/indisponibilité, plage horaire, projet/ingénieur liés), détection de conflits en temps réel (même studio ou même ingénieur) et validations (durée multiple de 15 minutes, jamais dans le passé) testées unitairement, export iCal, endpoints CRUD. Pages Angular avec vues Jour/Semaine/Mois, filtre par studio, formulaire avec retour de conflit explicite. 7 réservations de démonstration.
+- Le nom de l'application ("Gestion Studio" / "Studio Management") est désormais traduit et le titre de l'onglet du navigateur se met à jour dynamiquement selon la langue choisie.
 
 ### Corrigé
 - Le sous-titre du tableau de bord n'était pas traduit (texte français en dur) — utilise désormais une clé i18n.
 - Les enums partagés (`ClientSegment`, `ServiceType`, `ProjectStatus`, `Currency`, `PaymentMethod`) utilisaient des valeurs en minuscules alors que les enums Prisma correspondants sont en majuscules, ce qui cassait les filtres et libellés côté frontend — alignement des valeurs.
+- Le nom de l'application ne se traduisait pas en anglais (texte de marque codé en dur) — traduit et rendu dynamique.
 
 ### Notes techniques
 - Le port hôte PostgreSQL par défaut est `5433` (et non `5432`) car un PostgreSQL natif préexistant sur la machine de développement occupait déjà le 5432. Voir `docker-compose.yml` / `.env.example`.

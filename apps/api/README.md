@@ -11,9 +11,9 @@ src/
 ├── modules/
 │   ├── auth/       # implémenté (login, refresh, logout, verrouillage de compte)
 │   ├── users/      # implémenté (lecture seule)
-│   ├── clients/    # scaffolding — phase 2
-│   ├── projects/   # scaffolding — phase 3
-│   ├── planning/   # scaffolding — phase 4
+│   ├── clients/    # implémenté (phase 2)
+│   ├── projects/   # implémenté (phase 3)
+│   ├── planning/   # implémenté (phase 4)
 │   ├── resources/  # scaffolding — phase 5
 │   ├── billing/    # scaffolding — phase 6
 │   ├── reporting/  # scaffolding — phase 7
@@ -21,8 +21,8 @@ src/
 ├── app.ts
 └── server.ts
 prisma/
-├── schema.prisma  # User, Role, Permission, RolePermission, RefreshToken, AuditLog
-└── seed.ts        # crée les 7 rôles par défaut + un compte de démonstration par rôle
+├── schema.prisma  # User, Role, Permission, RolePermission, RefreshToken, AuditLog, Client, Project, Booking
+└── seed.ts        # rôles + comptes de démonstration + clients/projets/réservations de test
 ```
 
 ## Comptes de démonstration (après `npm run prisma:seed`)
