@@ -1,0 +1,167 @@
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+  <div class="flex items-center gap-2">
+    <gs-icon name="planning" [size]="22" class="text-gs-blue" />
+    <h2 class="font-display text-2xl font-semibold">{{ 'nav.planning' | translate }}</h2>
+  </div>
+  <a
+    routerLink="/planning/new"
+    class="inline-flex items-center gap-2 rounded-md bg-gs-blue text-gs-black font-semibold px-4 py-2 text-sm hover:opacity-90 transition-opacity w-fit"
+  >
+    <gs-icon name="add" [size]="16" />
+    {{ 'planning.add' | translate }}
+  </a>
+</div>
+
+<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+  <div class="flex items-center gap-2">
+    <button type="button" class="p-2 rounded-md bg-gs-dark-gray border border-white/10 hover:border-gs-blue" (click)="goPrev()">
+      <gs-icon name="prev" [size]="16" />
+    </button>
+    <button
+      type="button"
+      class="px-3 py-2 rounded-md bg-gs-dark-gray border border-white/10 text-sm hover:border-gs-blue"
+      (click)="goToday()"
+    >
+      {{ 'planning.today' | translate }}
+    </button>
+    <button type="button" class="p-2 rounded-md bg-gs-dark-gray border border-white/10 hover:border-gs-blue" (click)="goNext()">
+      <gs-icon name="next" [size]="16" />
+    </button>
+    <span class="ml-2 text-sm text-gs-light/70 capitalize">{{ rangeLabel() }}</span>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <select
+      [ngModel]="studioFilter()"
+      (ngModelChange)="studioFilter.set($event); load()"
+      class="rounded-md bg-gs-dark-gray border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    >
+      <option value="">{{ 'planning.all_studios' | translate }}</option>
+      @for (studio of studios; track studio) {
+        <option [value]="studio">{{ ('planning.studio.' + studio) | translate }}</option>
+      }
+    </select>
+
+    <div class="flex rounded-md border border-white/10 overflow-hidden text-sm">
+      <button
+        type="button"
+        class="px-3 py-2"
+        [class.bg-gs-blue]="view() === 'day'"
+        [class.text-gs-black]="view() === 'day'"
+        [class.bg-gs-dark-gray]="view() !== 'day'"
+        (click)="setView('day')"
+      >
+        {{ 'planning.view.day' | translate }}
+      </button>
+      <button
+        type="button"
+        class="px-3 py-2"
+        [class.bg-gs-blue]="view() === 'week'"
+        [class.text-gs-black]="view() === 'week'"
+        [class.bg-gs-dark-gray]="view() !== 'week'"
+        (click)="setView('week')"
+      >
+        {{ 'planning.view.week' | translate }}
+      </button>
+      <button
+        type="button"
+        class="px-3 py-2"
+        [class.bg-gs-blue]="view() === 'month'"
+        [class.text-gs-black]="view() === 'month'"
+        [class.bg-gs-dark-gray]="view() !== 'month'"
+        (click)="setView('month')"
+      >
+        {{ 'planning.view.month' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+@if (view() === 'day') {
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    @for (studio of studios; track studio) {
+      <div class="bg-gs-dark-gray border border-white/5 rounded-xl p-4 min-h-[200px]">
+        <h3 class="font-display text-sm font-semibold text-gs-light/80 mb-3">
+          {{ ('planning.studio.' + studio) | translate }}
+        </h3>
+        <div class="space-y-2">
+          @for (booking of bookingsForStudioOnDay(studio, refDate()); track booking.id) {
+            <a
+              [routerLink]="['/planning', booking.id]"
+              class="block rounded-md border px-3 py-2 text-xs hover:opacity-80 transition-opacity"
+              [class]="bookingClass(booking)"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-semibold">{{ formatTime(booking.startAt) }}–{{ formatTime(booking.endAt) }}</span>
+                <div class="flex items-center gap-2">
+                  <button type="button" (click)="downloadIcs(booking, $event)" class="hover:text-gs-light">
+                    <gs-icon name="download" [size]="12" />
+                  </button>
+                  <button type="button" (click)="remove(booking, $event)" class="hover:text-gs-orange">
+                    <gs-icon name="delete" [size]="12" />
+                  </button>
+                </div>
+              </div>
+              <div class="mt-1">{{ booking.title }}</div>
+              @if (booking.engineer) {
+                <div class="text-gs-light/50 mt-0.5">{{ booking.engineer.firstName }} {{ booking.engineer.lastName }}</div>
+              }
+            </a>
+          } @empty {
+            <p class="text-xs text-gs-light/40">{{ 'planning.empty' | translate }}</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@if (view() === 'week') {
+  <div class="overflow-x-auto">
+    <div class="grid grid-cols-7 gap-3 min-w-[900px]">
+      @for (day of weekDays(); track day.getTime()) {
+        <div class="bg-gs-dark-gray border border-white/5 rounded-xl p-3" [class.border-gs-blue]="isToday(day)">
+          <h3 class="text-xs font-semibold text-gs-light/70 mb-2 capitalize">
+            {{ day.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) }}
+          </h3>
+          <div class="space-y-2">
+            @for (booking of bookingsForDay(day); track booking.id) {
+              <a
+                [routerLink]="['/planning', booking.id]"
+                class="block rounded-md border px-2 py-1.5 text-xs hover:opacity-80 transition-opacity"
+                [class]="bookingClass(booking)"
+              >
+                <div class="font-semibold">{{ formatTime(booking.startAt) }}</div>
+                <div class="truncate">{{ booking.title }}</div>
+                <div class="text-gs-light/50">{{ ('planning.studio.' + booking.studio) | translate }}</div>
+              </a>
+            } @empty {
+              <p class="text-xs text-gs-light/30">—</p>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+@if (view() === 'month') {
+  <div class="bg-gs-dark-gray border border-white/5 rounded-xl p-4">
+    <div class="grid grid-cols-7 gap-2">
+      @for (day of monthGridDays(); track day.getTime()) {
+        <button
+          type="button"
+          (click)="selectDay(day)"
+          class="aspect-square rounded-lg border border-white/5 p-2 text-left hover:border-gs-blue transition-colors flex flex-col"
+          [class.opacity-40]="!isCurrentMonth(day)"
+          [class.border-gs-blue]="isToday(day)"
+        >
+          <span class="text-xs font-medium">{{ day.getDate() }}</span>
+          @if (bookingsForDay(day).length > 0) {
+            <span class="mt-auto text-[10px] text-gs-blue font-semibold">{{ bookingsForDay(day).length }} {{ 'planning.bookings_suffix' | translate }}</span>
+          }
+        </button>
+      }
+    </div>
+  </div>
+}

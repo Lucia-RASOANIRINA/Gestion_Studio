@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Gestion Studio"
+    "title": "Studio Management"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -13,7 +13,7 @@
     "settings": "Settings"
   },
   "dashboard": {
-    "subtitle": "Gestion Studio — management platform for an audio production house."
+    "subtitle": "Studio Management — management platform for an audio production house."
   },
   "auth": {
     "login": {
@@ -122,6 +122,49 @@
       "move_to": "Move to",
       "no_transition": "No transition available from this status.",
       "transition_error": "This transition is not allowed for your role."
+    }
+  },
+  "planning": {
+    "add": "New booking",
+    "today": "Today",
+    "all_studios": "All studios",
+    "empty": "No bookings.",
+    "bookings_suffix": "booking(s)",
+    "view": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "studio": {
+      "STUDIO_A": "Studio A",
+      "STUDIO_B": "Studio B",
+      "STUDIO_C": "Studio C",
+      "MOBILE": "Mobile"
+    },
+    "type": {
+      "SESSION": "Session",
+      "UNAVAILABILITY": "Unavailability"
+    },
+    "form": {
+      "create_title": "New booking",
+      "edit_title": "Edit booking",
+      "studio": "Studio",
+      "type": "Type",
+      "title": "Title",
+      "title_error": "Title must be between 2 and 200 characters.",
+      "start_at": "Start",
+      "end_at": "End",
+      "duration_hint": "Duration must be a multiple of 15 minutes and the booking cannot be in the past.",
+      "project": "Linked project",
+      "no_project": "No project",
+      "engineer": "Assigned engineer",
+      "no_engineer": "No engineer",
+      "notes": "Notes",
+      "save": "Save",
+      "cancel": "Cancel",
+      "error": "An error occurred while saving.",
+      "conflict_error": "This time slot conflicts with an existing booking (same studio or same engineer).",
+      "validation_error": "Check the duration (multiple of 15 minutes) and that the date is not in the past."
     }
   }
 }

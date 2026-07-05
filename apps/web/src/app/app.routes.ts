@@ -59,7 +59,23 @@ export const routes: Routes = [
       },
       {
         path: "planning",
-        loadComponent: () => import("./features/planning/planning.component").then((m) => m.PlanningComponent),
+        children: [
+          {
+            path: "",
+            loadComponent: () =>
+              import("./features/planning/planning.component").then((m) => m.PlanningComponent),
+          },
+          {
+            path: "new",
+            loadComponent: () =>
+              import("./features/planning/booking-form.component").then((m) => m.BookingFormComponent),
+          },
+          {
+            path: ":id",
+            loadComponent: () =>
+              import("./features/planning/booking-form.component").then((m) => m.BookingFormComponent),
+          },
+        ],
       },
       {
         path: "resources",

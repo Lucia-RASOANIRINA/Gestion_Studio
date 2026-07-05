@@ -123,5 +123,48 @@
       "no_transition": "Aucune transition disponible depuis ce statut.",
       "transition_error": "Cette transition n'est pas autorisée pour votre rôle."
     }
+  },
+  "planning": {
+    "add": "Nouvelle réservation",
+    "today": "Aujourd'hui",
+    "all_studios": "Tous les studios",
+    "empty": "Aucune réservation.",
+    "bookings_suffix": "réservation(s)",
+    "view": {
+      "day": "Jour",
+      "week": "Semaine",
+      "month": "Mois"
+    },
+    "studio": {
+      "STUDIO_A": "Studio A",
+      "STUDIO_B": "Studio B",
+      "STUDIO_C": "Studio C",
+      "MOBILE": "Mobile"
+    },
+    "type": {
+      "SESSION": "Session",
+      "UNAVAILABILITY": "Indisponibilité"
+    },
+    "form": {
+      "create_title": "Nouvelle réservation",
+      "edit_title": "Modifier la réservation",
+      "studio": "Studio",
+      "type": "Type",
+      "title": "Titre",
+      "title_error": "Le titre doit contenir entre 2 et 200 caractères.",
+      "start_at": "Début",
+      "end_at": "Fin",
+      "duration_hint": "La durée doit être un multiple de 15 minutes et la réservation ne peut pas être dans le passé.",
+      "project": "Projet lié",
+      "no_project": "Aucun projet",
+      "engineer": "Ingénieur assigné",
+      "no_engineer": "Aucun ingénieur",
+      "notes": "Notes",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "error": "Une erreur est survenue lors de l'enregistrement.",
+      "conflict_error": "Ce créneau est en conflit avec une réservation existante (même studio ou même ingénieur).",
+      "validation_error": "Vérifiez la durée (multiple de 15 minutes) et que la date ne soit pas dans le passé."
+    }
   }
 }

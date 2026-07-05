@@ -1,10 +1,14 @@
 import { Component, input } from "@angular/core";
 import {
+  LucideAlertTriangle,
   LucideArrowLeft,
   LucideBarChart3,
   LucideBoxes,
   LucideCalendarDays,
   LucideCheck,
+  LucideChevronLeft,
+  LucideChevronRight,
+  LucideDownload,
   LucideFolderKanban,
   LucideGlobe,
   LucideLayoutDashboard,
@@ -44,7 +48,11 @@ export type IconName =
   | "edit"
   | "delete"
   | "back"
-  | "check";
+  | "check"
+  | "prev"
+  | "next"
+  | "download"
+  | "alert";
 
 @Component({
   selector: "gs-icon",
@@ -71,6 +79,10 @@ export type IconName =
     LucideTrash2,
     LucideArrowLeft,
     LucideCheck,
+    LucideChevronLeft,
+    LucideChevronRight,
+    LucideDownload,
+    LucideAlertTriangle,
   ],
   template: `
     @switch (name()) {
@@ -136,6 +148,18 @@ export type IconName =
       }
       @case ("check") {
         <svg lucideCheck [size]="size()"></svg>
+      }
+      @case ("prev") {
+        <svg lucideChevronLeft [size]="size()"></svg>
+      }
+      @case ("next") {
+        <svg lucideChevronRight [size]="size()"></svg>
+      }
+      @case ("download") {
+        <svg lucideDownload [size]="size()"></svg>
+      }
+      @case ("alert") {
+        <svg lucideAlertTriangle [size]="size()"></svg>
       }
     }
   `,
