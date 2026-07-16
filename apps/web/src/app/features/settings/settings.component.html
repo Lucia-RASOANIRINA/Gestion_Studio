@@ -1,0 +1,208 @@
+<div class="max-w-3xl">
+  <div class="flex items-center gap-2 mb-6">
+    <gs-icon name="settings" [size]="22" class="text-gs-blue" />
+    <h2 class="font-display text-2xl font-semibold">{{ 'nav.settings' | translate }}</h2>
+  </div>
+
+  @if (loading()) {
+    <p class="text-gs-light/60">{{ 'common.loading' | translate }}</p>
+  } @else {
+    <div class="space-y-6">
+      <!-- Apparence / thème -->
+      <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+        <h3 class="font-display text-lg font-semibold mb-1">{{ 'settings.appearance.title' | translate }}</h3>
+        <p class="text-sm text-gs-light/60 mb-4">{{ 'settings.appearance.subtitle' | translate }}</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          @for (option of themeOptions; track option.value) {
+            <button
+              type="button"
+              (click)="selectTheme(option.value)"
+              class="rounded-lg border p-4 text-left transition-colors"
+              [class.border-gs-blue]="themePreference() === option.value"
+              [class.bg-gs-navy]="themePreference() === option.value"
+              [class.border-gs-border]="themePreference() !== option.value"
+              [class.hover:bg-gs-hover]="themePreference() !== option.value"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-medium">{{ option.labelKey | translate }}</span>
+                @if (themePreference() === option.value) {
+                  <gs-icon name="check" [size]="18" class="text-gs-blue" />
+                }
+              </div>
+              <span class="text-xs text-gs-light/50">{{ ('settings.theme.' + option.value + '_hint') | translate }}</span>
+            </button>
+          }
+        </div>
+      </section>
+
+      <!-- Langue -->
+      <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+        <h3 class="font-display text-lg font-semibold mb-1">{{ 'settings.language.title' | translate }}</h3>
+        <p class="text-sm text-gs-light/60 mb-4">{{ 'settings.language.subtitle' | translate }}</p>
+        <div class="flex gap-3">
+          <button
+            type="button"
+            (click)="changeLanguage('fr')"
+            class="rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+            [class.border-gs-blue]="locale() === 'fr'"
+            [class.bg-gs-navy]="locale() === 'fr'"
+            [class.border-gs-border]="locale() !== 'fr'"
+          >
+            Français
+          </button>
+          <button
+            type="button"
+            (click)="changeLanguage('en')"
+            class="rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+            [class.border-gs-blue]="locale() === 'en'"
+            [class.bg-gs-navy]="locale() === 'en'"
+            [class.border-gs-border]="locale() !== 'en'"
+          >
+            English
+          </button>
+        </div>
+      </section>
+
+      <!-- Profil -->
+      <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+        <h3 class="font-display text-lg font-semibold mb-4">{{ 'settings.profile.title' | translate }}</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label class="block">
+            <span class="text-sm text-gs-light/70">{{ 'settings.profile.first_name' | translate }}</span>
+            <input
+              type="text"
+              [ngModel]="firstName()"
+              (ngModelChange)="firstName.set($event)"
+              class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+            />
+          </label>
+          <label class="block">
+            <span class="text-sm text-gs-light/70">{{ 'settings.profile.last_name' | translate }}</span>
+            <input
+              type="text"
+              [ngModel]="lastName()"
+              (ngModelChange)="lastName.set($event)"
+              class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+            />
+          </label>
+          <label class="block sm:col-span-2">
+            <span class="text-sm text-gs-light/70">{{ 'settings.profile.phone' | translate }}</span>
+            <input
+              type="tel"
+              [ngModel]="phone()"
+              (ngModelChange)="phone.set($event)"
+              placeholder="+261340000000"
+              class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+            />
+          </label>
+        </div>
+        <div class="mt-4 flex items-center gap-3">
+          <button
+            type="button"
+            (click)="saveProfile()"
+            [disabled]="saving()"
+            class="inline-flex items-center gap-2 rounded-md bg-gs-blue px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90 disabled:opacity-50"
+          >
+            <gs-icon name="check" [size]="16" />
+            {{ 'settings.profile.save' | translate }}
+          </button>
+          @if (savedAt()) {
+            <span class="text-sm text-gs-green">{{ 'settings.saved' | translate }}</span>
+          }
+          @if (error()) {
+            <span class="text-sm text-gs-orange">{{ 'settings.profile.error' | translate }}</span>
+          }
+        </div>
+      </section>
+
+      <!-- Sécurité : double authentification -->
+      @if (profile(); as p) {
+        <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+          <h3 class="font-display text-lg font-semibold mb-1">{{ 'settings.security.title' | translate }}</h3>
+          <p class="text-sm text-gs-light/60 mb-4">{{ 'settings.security.subtitle' | translate }}</p>
+
+          @if (p.twoFactorEnabled) {
+            <div class="flex items-center gap-2 mb-4">
+              <span class="rounded-full bg-gs-green/15 text-gs-green px-2.5 py-0.5 text-xs font-medium">{{ 'settings.security.enabled' | translate }}</span>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 max-w-md">
+              <input
+                type="text" inputmode="numeric" maxlength="6"
+                [ngModel]="disableCode()" (ngModelChange)="disableCode.set($event)"
+                [placeholder]="'settings.security.code_placeholder' | translate"
+                class="flex-1 rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm tracking-widest outline-none focus:border-gs-blue"
+              />
+              <button type="button" (click)="confirmDisable()" [disabled]="twoFactorBusy()"
+                class="rounded-md border border-gs-orange px-4 py-2 text-sm font-semibold text-gs-orange hover:bg-gs-orange hover:text-gs-black disabled:opacity-50">
+                {{ 'settings.security.disable' | translate }}
+              </button>
+            </div>
+          } @else {
+            @if (twoFactorSetup(); as setup) {
+              <p class="text-sm text-gs-light/70 mb-2">{{ 'settings.security.scan_hint' | translate }}</p>
+              <div class="rounded-md bg-gs-black border border-gs-border p-3 mb-3">
+                <p class="text-xs text-gs-light/50 mb-1">{{ 'settings.security.secret' | translate }}</p>
+                <code class="block break-all text-sm text-gs-blue font-mono">{{ setup.secret }}</code>
+                <p class="text-xs text-gs-light/40 mt-2 break-all">{{ setup.otpauthUri }}</p>
+              </div>
+              <div class="flex flex-col sm:flex-row gap-2 max-w-md">
+                <input
+                  type="text" inputmode="numeric" maxlength="6"
+                  [ngModel]="enableCode()" (ngModelChange)="enableCode.set($event)"
+                  [placeholder]="'settings.security.code_placeholder' | translate"
+                  class="flex-1 rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm tracking-widest outline-none focus:border-gs-blue"
+                />
+                <button type="button" (click)="confirmEnable()" [disabled]="twoFactorBusy()"
+                  class="rounded-md bg-gs-blue px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90 disabled:opacity-50">
+                  {{ 'settings.security.confirm' | translate }}
+                </button>
+                <button type="button" (click)="cancelTwoFactorSetup()" class="text-sm text-gs-light/60 hover:text-gs-light px-2">
+                  {{ 'settings.security.cancel' | translate }}
+                </button>
+              </div>
+            } @else {
+              <button type="button" (click)="startTwoFactorSetup()" [disabled]="twoFactorBusy()"
+                class="inline-flex items-center gap-2 rounded-md border border-gs-blue px-4 py-2 text-sm font-semibold text-gs-blue hover:bg-gs-blue hover:text-gs-black disabled:opacity-50">
+                <gs-icon name="lock" [size]="16" />
+                {{ 'settings.security.enable' | translate }}
+              </button>
+            }
+          }
+
+          @if (twoFactorError()) {
+            <p class="text-sm text-gs-orange mt-3">{{ 'settings.security.error' | translate }}</p>
+          }
+        </section>
+      }
+
+      <!-- Compte (lecture seule) -->
+      @if (profile(); as p) {
+        <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+          <h3 class="font-display text-lg font-semibold mb-4">{{ 'settings.account.title' | translate }}</h3>
+          <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div>
+              <dt class="text-gs-light/50">{{ 'settings.account.email' | translate }}</dt>
+              <dd class="mt-1">{{ p.email }}</dd>
+            </div>
+            <div>
+              <dt class="text-gs-light/50">{{ 'settings.account.member_since' | translate }}</dt>
+              <dd class="mt-1">{{ p.createdAt | date: 'longDate' }}</dd>
+            </div>
+            <div>
+              <dt class="text-gs-light/50">{{ 'settings.account.roles' | translate }}</dt>
+              <dd class="mt-1 flex flex-wrap gap-2">
+                @for (role of p.roles; track role.name) {
+                  <span class="rounded-full bg-gs-navy px-2.5 py-0.5 text-xs text-gs-blue">{{ role.name }}</span>
+                }
+              </dd>
+            </div>
+            <div>
+              <dt class="text-gs-light/50">{{ 'settings.account.two_factor' | translate }}</dt>
+              <dd class="mt-1">{{ (p.twoFactorEnabled ? 'settings.account.enabled' : 'settings.account.disabled') | translate }}</dd>
+            </div>
+          </dl>
+        </section>
+      }
+    </div>
+  }
+</div>

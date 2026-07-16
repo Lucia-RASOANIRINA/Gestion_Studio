@@ -1,14 +1,15 @@
 import { Router } from "express";
-import { PermissionAction, PermissionModule } from "@prisma/client";
 import { authenticate } from "../../common/middleware/authenticate";
-import { requirePermission } from "../../common/rbac/requirePermission";
-import { getSettingsHandler } from "./settings.controller";
+import { asyncHandler } from "../../common/middleware/asyncHandler";
+import { validateBody } from "../../common/middleware/validate";
+import { getProfileHandler, updateProfileHandler } from "./settings.controller";
+import { updateProfileSchema } from "./settings.validation";
 
 export const settingsRouter = Router();
 
 settingsRouter.use(authenticate);
-settingsRouter.get(
-  "/",
-  requirePermission(PermissionModule.SETTINGS, PermissionAction.READ),
-  getSettingsHandler
-);
+
+// Profil & préférences personnelles (langue, thème) : accessibles à tout
+// utilisateur authentifié, indépendamment de la permission SETTINGS.
+settingsRouter.get("/me", asyncHandler(getProfileHandler));
+settingsRouter.patch("/me", validateBody(updateProfileSchema), asyncHandler(updateProfileHandler));
