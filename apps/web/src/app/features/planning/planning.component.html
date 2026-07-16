@@ -12,19 +12,26 @@
   </a>
 </div>
 
+@if (error(); as errorKey) {
+  <div class="flex items-center gap-2 rounded-md border border-gs-orange/40 bg-gs-orange/10 text-gs-orange text-sm px-4 py-3 mb-4">
+    <gs-icon name="alert" [size]="16" />
+    {{ errorKey | translate }}
+  </div>
+}
+
 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
   <div class="flex items-center gap-2">
-    <button type="button" class="p-2 rounded-md bg-gs-dark-gray border border-white/10 hover:border-gs-blue" (click)="goPrev()">
+    <button type="button" class="p-2 rounded-md bg-gs-dark-gray border border-gs-border hover:border-gs-blue" (click)="goPrev()">
       <gs-icon name="prev" [size]="16" />
     </button>
     <button
       type="button"
-      class="px-3 py-2 rounded-md bg-gs-dark-gray border border-white/10 text-sm hover:border-gs-blue"
+      class="px-3 py-2 rounded-md bg-gs-dark-gray border border-gs-border text-sm hover:border-gs-blue"
       (click)="goToday()"
     >
       {{ 'planning.today' | translate }}
     </button>
-    <button type="button" class="p-2 rounded-md bg-gs-dark-gray border border-white/10 hover:border-gs-blue" (click)="goNext()">
+    <button type="button" class="p-2 rounded-md bg-gs-dark-gray border border-gs-border hover:border-gs-blue" (click)="goNext()">
       <gs-icon name="next" [size]="16" />
     </button>
     <span class="ml-2 text-sm text-gs-light/70 capitalize">{{ rangeLabel() }}</span>
@@ -34,7 +41,7 @@
     <select
       [ngModel]="studioFilter()"
       (ngModelChange)="studioFilter.set($event); load()"
-      class="rounded-md bg-gs-dark-gray border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="rounded-md bg-gs-dark-gray border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     >
       <option value="">{{ 'planning.all_studios' | translate }}</option>
       @for (studio of studios; track studio) {
@@ -42,7 +49,7 @@
       }
     </select>
 
-    <div class="flex rounded-md border border-white/10 overflow-hidden text-sm">
+    <div class="flex rounded-md border border-gs-border overflow-hidden text-sm">
       <button
         type="button"
         class="px-3 py-2"
@@ -80,7 +87,7 @@
 @if (view() === 'day') {
   <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
     @for (studio of studios; track studio) {
-      <div class="bg-gs-dark-gray border border-white/5 rounded-xl p-4 min-h-[200px]">
+      <div class="bg-gs-dark-gray border border-gs-border rounded-xl p-4 min-h-[200px]">
         <h3 class="font-display text-sm font-semibold text-gs-light/80 mb-3">
           {{ ('planning.studio.' + studio) | translate }}
         </h3>
@@ -120,7 +127,7 @@
   <div class="overflow-x-auto">
     <div class="grid grid-cols-7 gap-3 min-w-[900px]">
       @for (day of weekDays(); track day.getTime()) {
-        <div class="bg-gs-dark-gray border border-white/5 rounded-xl p-3" [class.border-gs-blue]="isToday(day)">
+        <div class="bg-gs-dark-gray border border-gs-border rounded-xl p-3" [class.border-gs-blue]="isToday(day)">
           <h3 class="text-xs font-semibold text-gs-light/70 mb-2 capitalize">
             {{ day.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) }}
           </h3>
@@ -146,13 +153,13 @@
 }
 
 @if (view() === 'month') {
-  <div class="bg-gs-dark-gray border border-white/5 rounded-xl p-4">
+  <div class="bg-gs-dark-gray border border-gs-border rounded-xl p-4">
     <div class="grid grid-cols-7 gap-2">
       @for (day of monthGridDays(); track day.getTime()) {
         <button
           type="button"
           (click)="selectDay(day)"
-          class="aspect-square rounded-lg border border-white/5 p-2 text-left hover:border-gs-blue transition-colors flex flex-col"
+          class="aspect-square rounded-lg border border-gs-border p-2 text-left hover:border-gs-blue transition-colors flex flex-col"
           [class.opacity-40]="!isCurrentMonth(day)"
           [class.border-gs-blue]="isToday(day)"
         >

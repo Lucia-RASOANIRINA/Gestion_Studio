@@ -8,26 +8,173 @@
     "projects": "Projets & Services",
     "planning": "Planning & Réservations",
     "resources": "Ressources",
+    "studios": "Studios",
+    "hr": "Ressources Humaines",
     "billing": "Facturation & Finances",
     "reporting": "Reporting & Analytics",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "menu": "Menu",
+    "close": "Fermer"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune alerte pour le moment.",
+    "type": {
+      "low_stock": "Stock bas",
+      "overdue_invoice": "Facture en retard",
+      "maintenance_due": "Maintenance à prévoir"
+    }
+  },
+  "hr": {
+    "add": "Nouvel employé",
+    "back": "Retour à la liste",
+    "empty": "Aucun employé.",
+    "type": { "EMPLOYEE": "Salarié", "FREELANCE": "Freelance" },
+    "status": { "ACTIVE": "Actif", "INACTIVE": "Inactif" },
+    "leave_type": { "LEAVE": "Congé", "SICK": "Maladie", "UNPAID": "Sans solde", "OVERTIME": "Heures supp.", "ABSENCE": "Absence" },
+    "leave_status": { "PENDING": "En attente", "APPROVED": "Approuvé", "REJECTED": "Refusé" },
+    "table": {
+      "name": "Nom",
+      "position": "Poste",
+      "type": "Type",
+      "daily_rate": "Taux journalier",
+      "leaves": "Congés",
+      "actions": "Actions"
+    },
+    "form": {
+      "create_title": "Nouvel employé",
+      "edit_title": "Modifier l'employé",
+      "first_name": "Prénom",
+      "last_name": "Nom",
+      "position": "Poste",
+      "type": "Type",
+      "status": "Statut",
+      "daily_rate": "Taux journalier (MGA)",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "hire_date": "Date d'embauche",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "error": "Une erreur est survenue lors de l'enregistrement."
+    },
+    "leaves": {
+      "title": "Congés, absences & heures supplémentaires",
+      "empty": "Aucune demande enregistrée.",
+      "add": "Nouvelle demande",
+      "reason": "Motif (facultatif)",
+      "record": "Enregistrer"
+    }
+  },
+  "studios": {
+    "add": "Nouveau studio",
+    "back": "Retour aux studios",
+    "empty": "Aucun studio.",
+    "capacity": "Capacité",
+    "hourly_price": "Tarif horaire",
+    "equipment": "Équipements",
+    "type": {
+      "RECORDING": "Enregistrement",
+      "PODCAST": "Podcast",
+      "LIVE": "Live",
+      "VIDEO": "Vidéo",
+      "REHEARSAL": "Répétition",
+      "OTHER": "Autre"
+    },
+    "status": {
+      "AVAILABLE": "Disponible",
+      "MAINTENANCE": "En maintenance",
+      "CLOSED": "Fermé"
+    },
+    "form": {
+      "create_title": "Nouveau studio",
+      "edit_title": "Modifier le studio",
+      "name": "Nom",
+      "type": "Type",
+      "status": "Statut",
+      "description": "Description",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "error": "Une erreur est survenue lors de l'enregistrement."
+    }
   },
   "dashboard": {
-    "subtitle": "Gestion Studio — plateforme de gestion pour maison de production audio."
+    "subtitle": "Gestion Studio — plateforme de gestion pour maison de production audio.",
+    "days": "j",
+    "kpi": {
+      "projects_in_progress": "Projets en cours",
+      "projects_completed": "Projets terminés",
+      "revenue_month": "Revenus du mois",
+      "revenue_year": "Revenus annuels",
+      "new_clients": "Nouveaux clients (mois)",
+      "occupancy": "Taux d'occupation",
+      "avg_duration": "Durée moy. projet",
+      "bookings_today": "Réservations aujourd'hui",
+      "bookings_week": "Réservations cette semaine",
+      "outstanding": "En attente de paiement",
+      "clients_total": "Clients (total)",
+      "low_stock": "Consommables en stock bas"
+    },
+    "charts": {
+      "revenue": "Évolution des revenus",
+      "bookings": "Évolution des réservations",
+      "new_clients": "Évolution des nouveaux clients",
+      "services": "Services les plus demandés",
+      "revenue_by_service": "Répartition des revenus par service"
+    },
+    "activity": {
+      "title": "Activités récentes",
+      "empty": "Aucune activité pour le moment."
+    }
+  },
+  "audit": {
+    "system": "Système",
+    "entity": {
+      "Client": "Client",
+      "Project": "Projet",
+      "Booking": "Réservation",
+      "Invoice": "Facture",
+      "Equipment": "Matériel",
+      "Consumable": "Consommable",
+      "User": "Utilisateur"
+    },
+    "verb": {
+      "create": "création",
+      "update": "modification",
+      "delete": "suppression",
+      "status": "changement de statut",
+      "adjust": "ajustement de stock",
+      "profile": "mise à jour du profil",
+      "login": "connexion",
+      "logout": "déconnexion",
+      "transition": "changement d'étape"
+    }
   },
   "auth": {
     "login": {
       "title": "Connexion",
       "email": "Adresse e-mail",
       "password": "Mot de passe",
+      "code": "Code d'authentification (2FA)",
       "submit": "Se connecter",
-      "error": "Identifiants invalides."
+      "error": "Identifiants invalides.",
+      "code_error": "Code d'authentification invalide."
     }
   },
   "common": {
     "language": "Langue",
     "loading": "Chargement...",
-    "coming_soon": "Module à venir dans une prochaine phase."
+    "coming_soon": "Module à venir dans une prochaine phase.",
+    "errors": {
+      "validation": "Les données saisies sont invalides. Vérifiez les champs en surbrillance.",
+      "unauthorized": "Votre session a expiré. Veuillez vous reconnecter.",
+      "forbidden": "Vous n'avez pas la permission d'effectuer cette action.",
+      "not_found": "Cet élément n'existe plus ou a déjà été supprimé.",
+      "conflict": "Cette action entre en conflit avec une donnée existante.",
+      "network": "Impossible de contacter le serveur. Vérifiez votre connexion.",
+      "server": "Une erreur serveur est survenue. Réessayez dans quelques instants.",
+      "unknown": "Une erreur inattendue est survenue."
+    }
   },
   "clients": {
     "add": "Nouveau client",
@@ -35,6 +182,7 @@
     "all_segments": "Tous les segments",
     "empty": "Aucun client trouvé.",
     "total_suffix": "client(s)",
+    "delete_conflict": "Impossible de supprimer ce client : des projets y sont encore liés.",
     "segment": {
       "ARTIST": "Artiste",
       "LABEL": "Label",
@@ -49,7 +197,19 @@
       "contact": "Contact",
       "projects": "Projets",
       "reliability": "Fiabilité",
+      "loyalty": "Fidélité",
       "actions": "Actions"
+    },
+    "tier": {
+      "BRONZE": "Bronze",
+      "SILVER": "Silver",
+      "GOLD": "Gold",
+      "PLATINUM": "Platinum"
+    },
+    "blacklist": {
+      "badge": "Blacklisté",
+      "action": "Basculer la blacklist",
+      "reason_prompt": "Motif du blocage (mauvais payeur, fraude…) :"
     },
     "form": {
       "create_title": "Nouveau client",
@@ -121,7 +281,10 @@
       "workflow": "Workflow",
       "move_to": "Passer à",
       "no_transition": "Aucune transition disponible depuis ce statut.",
-      "transition_error": "Cette transition n'est pas autorisée pour votre rôle."
+      "transition_error": "Cette transition n'est pas autorisée pour votre rôle.",
+      "timeline": "Chronologie du projet",
+      "progress": "Avancement",
+      "checklist": "Check-list avant livraison"
     }
   },
   "planning": {
@@ -165,6 +328,281 @@
       "error": "Une erreur est survenue lors de l'enregistrement.",
       "conflict_error": "Ce créneau est en conflit avec une réservation existante (même studio ou même ingénieur).",
       "validation_error": "Vérifiez la durée (multiple de 15 minutes) et que la date ne soit pas dans le passé."
+    }
+  },
+  "resources": {
+    "tabs": {
+      "equipment": "Matériel",
+      "consumables": "Consommables"
+    },
+    "equipment": {
+      "add": "Nouveau matériel",
+      "search_placeholder": "Rechercher un équipement...",
+      "all_categories": "Toutes les catégories",
+      "all_statuses": "Tous les statuts",
+      "empty": "Aucun équipement trouvé.",
+      "total_suffix": "équipement(s)",
+      "category": {
+        "MICROPHONE": "Microphone",
+        "CONSOLE": "Console",
+        "INTERFACE": "Interface",
+        "MONITOR": "Moniteur",
+        "INSTRUMENT": "Instrument",
+        "CABLE": "Câble",
+        "OTHER": "Autre"
+      },
+      "status": {
+        "AVAILABLE": "Disponible",
+        "IN_USE": "En session",
+        "MAINTENANCE": "En maintenance",
+        "RETIRED": "Retiré"
+      },
+      "table": {
+        "name": "Nom",
+        "category": "Catégorie",
+        "studio": "Studio",
+        "status": "État",
+        "value": "Valeur résiduelle",
+        "actions": "Actions"
+      },
+      "form": {
+        "create_title": "Nouveau matériel",
+        "edit_title": "Modifier le matériel",
+        "name": "Nom",
+        "name_error": "Le nom doit contenir entre 2 et 200 caractères.",
+        "category": "Catégorie",
+        "status": "État",
+        "studio": "Studio de rattachement",
+        "no_studio": "Aucun studio",
+        "serial_number": "Numéro de série",
+        "brand": "Marque",
+        "model": "Modèle",
+        "location": "Localisation",
+        "warranty_until": "Garantie jusqu'au",
+        "next_maintenance": "Prochaine maintenance",
+        "purchase_date": "Date d'achat",
+        "purchase_price": "Prix d'achat (MGA)",
+        "current_value": "Valeur résiduelle (MGA)",
+        "notes": "Notes",
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+      }
+    },
+    "maintenance": {
+      "title": "Historique de maintenance",
+      "empty": "Aucune intervention enregistrée.",
+      "add": "Ajouter une intervention",
+      "description": "Description de l'intervention",
+      "technician": "Technicien",
+      "cost": "Coût (MGA)",
+      "parts": "Pièces remplacées",
+      "record": "Enregistrer"
+    },
+    "consumables": {
+      "add": "Nouveau consommable",
+      "search_placeholder": "Rechercher un consommable...",
+      "low_stock_only": "Stock bas uniquement",
+      "low_stock": "Stock bas",
+      "in_stock": "En stock",
+      "empty": "Aucun consommable trouvé.",
+      "total_suffix": "consommable(s)",
+      "adjust_error": "Stock insuffisant pour cet ajustement.",
+      "table": {
+        "name": "Nom",
+        "quantity": "Quantité",
+        "threshold": "Seuil d'alerte",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "form": {
+        "create_title": "Nouveau consommable",
+        "edit_title": "Modifier le consommable",
+        "name": "Nom",
+        "name_error": "Le nom doit contenir entre 2 et 200 caractères.",
+        "unit": "Unité",
+        "quantity": "Quantité",
+        "threshold": "Seuil d'alerte",
+        "notes": "Notes",
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+      }
+    }
+  },
+  "billing": {
+    "add": "Nouvelle facture",
+    "search_placeholder": "Rechercher une facture...",
+    "all_statuses": "Tous les statuts",
+    "empty": "Aucune facture trouvée.",
+    "total_suffix": "facture(s)",
+    "kpi": {
+      "invoiced": "Facturé",
+      "paid": "Encaissé",
+      "outstanding": "En attente",
+      "overdue": "En retard"
+    },
+    "status": {
+      "DRAFT": "Brouillon",
+      "SENT": "Envoyée",
+      "PARTIAL": "Partielle",
+      "PAID": "Payée",
+      "OVERDUE": "En retard",
+      "CANCELLED": "Annulée"
+    },
+    "method": {
+      "CASH": "Espèces",
+      "MOBILE_MONEY": "Mobile Money",
+      "BANK_TRANSFER": "Virement",
+      "CARD": "Carte",
+      "OTHER": "Autre"
+    },
+    "table": {
+      "reference": "Référence",
+      "client": "Client",
+      "status": "Statut",
+      "total": "Total",
+      "balance": "Solde",
+      "due_date": "Échéance"
+    },
+    "totals": {
+      "subtotal": "Sous-total",
+      "tax": "TVA",
+      "total": "Total"
+    },
+    "form": {
+      "create_title": "Nouvelle facture",
+      "back": "Retour aux factures",
+      "client": "Client",
+      "select_client": "Sélectionner un client",
+      "project": "Projet lié",
+      "no_project": "Aucun projet",
+      "items": "Lignes de facturation",
+      "add_item": "Ajouter une ligne",
+      "item_description": "Description",
+      "item_quantity": "Qté",
+      "item_unit_price": "Prix unitaire",
+      "remove_item": "Supprimer la ligne",
+      "tax_rate": "TVA (%)",
+      "due_date": "Date d'échéance",
+      "notes": "Notes",
+      "save": "Créer la facture",
+      "cancel": "Annuler",
+      "error": "Une erreur est survenue lors de l'enregistrement."
+    },
+    "detail": {
+      "payments": "Paiements",
+      "no_payments": "Aucun paiement enregistré.",
+      "add_payment": "Enregistrer un paiement",
+      "amount": "Montant",
+      "record": "Enregistrer",
+      "change_status": "Changer le statut",
+      "delete": "Supprimer",
+      "pdf": "Télécharger PDF",
+      "pdf_title": "FACTURE"
+    },
+    "sign": {
+      "action": "Faire signer",
+      "title": "Signature électronique",
+      "hint": "Signez ci-dessous avec la souris ou le doigt. La facture sera verrouillée.",
+      "signer": "Nom du signataire",
+      "clear": "Effacer",
+      "cancel": "Annuler",
+      "confirm": "Valider la signature",
+      "signed_title": "Signée"
+    }
+  },
+  "finance": {
+    "title": "Facturation & Finances",
+    "tabs": {
+      "invoices": "Factures",
+      "treasury": "Trésorerie & Dépenses"
+    },
+    "inflow": "Entrées",
+    "outflow": "Sorties",
+    "balance": "Solde",
+    "expected": "Prévisionnel",
+    "cashflow": "Flux de trésorerie (6 mois)",
+    "by_category": "Dépenses par catégorie",
+    "empty": "Aucune dépense enregistrée.",
+    "add_expense": "Nouvelle dépense",
+    "expense_label": "Libellé",
+    "expense_category": "Catégorie",
+    "expense_date": "Date",
+    "amount": "Montant",
+    "add": "Ajouter",
+    "category": {
+      "SALARY": "Salaires",
+      "RENT": "Loyer",
+      "INTERNET": "Internet",
+      "ELECTRICITY": "Électricité",
+      "MAINTENANCE": "Maintenance",
+      "TAX": "Taxes & impôts",
+      "EQUIPMENT": "Équipement",
+      "SUPPLIES": "Fournitures",
+      "OTHER": "Autre"
+    }
+  },
+  "reporting": {
+    "tiles": {
+      "invoiced": "Facturé",
+      "paid": "Encaissé",
+      "outstanding": "En attente",
+      "clients": "Clients",
+      "projects": "Projets",
+      "bookings": "Réservations à venir",
+      "low_stock": "Stock bas"
+    },
+    "revenue_by_month": "Chiffre d'affaires encaissé (6 mois)",
+    "projects_by_status": "Projets par statut",
+    "top_clients": "Meilleurs clients",
+    "equipment_by_status": "Matériel par état"
+  },
+  "settings": {
+    "saved": "Enregistré",
+    "appearance": {
+      "title": "Apparence",
+      "subtitle": "Choisissez le thème de l'interface."
+    },
+    "theme": {
+      "dark": "Sombre",
+      "light": "Clair",
+      "system": "Système",
+      "dark_hint": "Interface sombre en permanence.",
+      "light_hint": "Interface claire en permanence.",
+      "system_hint": "Suit le réglage du système."
+    },
+    "language": {
+      "title": "Langue",
+      "subtitle": "Langue de l'interface."
+    },
+    "profile": {
+      "title": "Profil",
+      "first_name": "Prénom",
+      "last_name": "Nom",
+      "phone": "Téléphone",
+      "save": "Enregistrer",
+      "error": "Une erreur est survenue lors de l'enregistrement."
+    },
+    "account": {
+      "title": "Compte",
+      "email": "E-mail",
+      "member_since": "Membre depuis",
+      "roles": "Rôles",
+      "two_factor": "Double authentification",
+      "enabled": "Activée",
+      "disabled": "Désactivée"
+    },
+    "security": {
+      "title": "Sécurité — Double authentification",
+      "subtitle": "Ajoutez une couche de sécurité avec une application d'authentification (Google Authenticator, Authy…).",
+      "enable": "Activer la 2FA",
+      "enabled": "Activée",
+      "disable": "Désactiver",
+      "confirm": "Confirmer",
+      "cancel": "Annuler",
+      "scan_hint": "Saisissez cette clé dans votre application d'authentification, puis entrez le code à 6 chiffres généré.",
+      "secret": "Clé secrète",
+      "code_placeholder": "Code à 6 chiffres",
+      "error": "Code invalide, réessayez."
     }
   }
 }

@@ -8,26 +8,173 @@
     "projects": "Projects & Services",
     "planning": "Planning & Bookings",
     "resources": "Resources",
+    "studios": "Studios",
+    "hr": "Human Resources",
     "billing": "Billing & Finance",
     "reporting": "Reporting & Analytics",
-    "settings": "Settings"
+    "settings": "Settings",
+    "logout": "Log out",
+    "menu": "Menu",
+    "close": "Close"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No alerts right now.",
+    "type": {
+      "low_stock": "Low stock",
+      "overdue_invoice": "Overdue invoice",
+      "maintenance_due": "Maintenance due"
+    }
+  },
+  "hr": {
+    "add": "New employee",
+    "back": "Back to list",
+    "empty": "No employee.",
+    "type": { "EMPLOYEE": "Employee", "FREELANCE": "Freelance" },
+    "status": { "ACTIVE": "Active", "INACTIVE": "Inactive" },
+    "leave_type": { "LEAVE": "Leave", "SICK": "Sick", "UNPAID": "Unpaid", "OVERTIME": "Overtime", "ABSENCE": "Absence" },
+    "leave_status": { "PENDING": "Pending", "APPROVED": "Approved", "REJECTED": "Rejected" },
+    "table": {
+      "name": "Name",
+      "position": "Position",
+      "type": "Type",
+      "daily_rate": "Daily rate",
+      "leaves": "Leaves",
+      "actions": "Actions"
+    },
+    "form": {
+      "create_title": "New employee",
+      "edit_title": "Edit employee",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "position": "Position",
+      "type": "Type",
+      "status": "Status",
+      "daily_rate": "Daily rate (MGA)",
+      "email": "Email",
+      "phone": "Phone",
+      "hire_date": "Hire date",
+      "save": "Save",
+      "cancel": "Cancel",
+      "error": "An error occurred while saving."
+    },
+    "leaves": {
+      "title": "Leave, absence & overtime",
+      "empty": "No request recorded.",
+      "add": "New request",
+      "reason": "Reason (optional)",
+      "record": "Record"
+    }
+  },
+  "studios": {
+    "add": "New studio",
+    "back": "Back to studios",
+    "empty": "No studio.",
+    "capacity": "Capacity",
+    "hourly_price": "Hourly rate",
+    "equipment": "Equipment",
+    "type": {
+      "RECORDING": "Recording",
+      "PODCAST": "Podcast",
+      "LIVE": "Live",
+      "VIDEO": "Video",
+      "REHEARSAL": "Rehearsal",
+      "OTHER": "Other"
+    },
+    "status": {
+      "AVAILABLE": "Available",
+      "MAINTENANCE": "Under maintenance",
+      "CLOSED": "Closed"
+    },
+    "form": {
+      "create_title": "New studio",
+      "edit_title": "Edit studio",
+      "name": "Name",
+      "type": "Type",
+      "status": "Status",
+      "description": "Description",
+      "save": "Save",
+      "cancel": "Cancel",
+      "error": "An error occurred while saving."
+    }
   },
   "dashboard": {
-    "subtitle": "Studio Management — management platform for an audio production house."
+    "subtitle": "Studio Management — management platform for an audio production house.",
+    "days": "d",
+    "kpi": {
+      "projects_in_progress": "Projects in progress",
+      "projects_completed": "Completed projects",
+      "revenue_month": "Monthly revenue",
+      "revenue_year": "Yearly revenue",
+      "new_clients": "New clients (month)",
+      "occupancy": "Occupancy rate",
+      "avg_duration": "Avg. project time",
+      "bookings_today": "Bookings today",
+      "bookings_week": "Bookings this week",
+      "outstanding": "Awaiting payment",
+      "clients_total": "Clients (total)",
+      "low_stock": "Low-stock consumables"
+    },
+    "charts": {
+      "revenue": "Revenue trend",
+      "bookings": "Bookings trend",
+      "new_clients": "New clients trend",
+      "services": "Most requested services",
+      "revenue_by_service": "Revenue by service"
+    },
+    "activity": {
+      "title": "Recent activity",
+      "empty": "No activity yet."
+    }
+  },
+  "audit": {
+    "system": "System",
+    "entity": {
+      "Client": "Client",
+      "Project": "Project",
+      "Booking": "Booking",
+      "Invoice": "Invoice",
+      "Equipment": "Equipment",
+      "Consumable": "Consumable",
+      "User": "User"
+    },
+    "verb": {
+      "create": "created",
+      "update": "updated",
+      "delete": "deleted",
+      "status": "status change",
+      "adjust": "stock adjustment",
+      "profile": "profile update",
+      "login": "login",
+      "logout": "logout",
+      "transition": "stage change"
+    }
   },
   "auth": {
     "login": {
       "title": "Login",
       "email": "Email address",
       "password": "Password",
+      "code": "Authentication code (2FA)",
       "submit": "Sign in",
-      "error": "Invalid credentials."
+      "error": "Invalid credentials.",
+      "code_error": "Invalid authentication code."
     }
   },
   "common": {
     "language": "Language",
     "loading": "Loading...",
-    "coming_soon": "Module coming in a future phase."
+    "coming_soon": "Module coming in a future phase.",
+    "errors": {
+      "validation": "The submitted data is invalid. Check the highlighted fields.",
+      "unauthorized": "Your session has expired. Please sign in again.",
+      "forbidden": "You do not have permission to perform this action.",
+      "not_found": "This item no longer exists or has already been deleted.",
+      "conflict": "This action conflicts with existing data.",
+      "network": "Could not reach the server. Check your connection.",
+      "server": "A server error occurred. Please try again shortly.",
+      "unknown": "An unexpected error occurred."
+    }
   },
   "clients": {
     "add": "New client",
@@ -35,6 +182,7 @@
     "all_segments": "All segments",
     "empty": "No clients found.",
     "total_suffix": "client(s)",
+    "delete_conflict": "This client cannot be deleted: it still has linked projects.",
     "segment": {
       "ARTIST": "Artist",
       "LABEL": "Label",
@@ -49,7 +197,19 @@
       "contact": "Contact",
       "projects": "Projects",
       "reliability": "Reliability",
+      "loyalty": "Loyalty",
       "actions": "Actions"
+    },
+    "tier": {
+      "BRONZE": "Bronze",
+      "SILVER": "Silver",
+      "GOLD": "Gold",
+      "PLATINUM": "Platinum"
+    },
+    "blacklist": {
+      "badge": "Blacklisted",
+      "action": "Toggle blacklist",
+      "reason_prompt": "Blocking reason (bad payer, fraud…):"
     },
     "form": {
       "create_title": "New client",
@@ -121,7 +281,10 @@
       "workflow": "Workflow",
       "move_to": "Move to",
       "no_transition": "No transition available from this status.",
-      "transition_error": "This transition is not allowed for your role."
+      "transition_error": "This transition is not allowed for your role.",
+      "timeline": "Project timeline",
+      "progress": "Progress",
+      "checklist": "Pre-delivery checklist"
     }
   },
   "planning": {
@@ -165,6 +328,281 @@
       "error": "An error occurred while saving.",
       "conflict_error": "This time slot conflicts with an existing booking (same studio or same engineer).",
       "validation_error": "Check the duration (multiple of 15 minutes) and that the date is not in the past."
+    }
+  },
+  "resources": {
+    "tabs": {
+      "equipment": "Equipment",
+      "consumables": "Consumables"
+    },
+    "equipment": {
+      "add": "New equipment",
+      "search_placeholder": "Search equipment...",
+      "all_categories": "All categories",
+      "all_statuses": "All statuses",
+      "empty": "No equipment found.",
+      "total_suffix": "equipment item(s)",
+      "category": {
+        "MICROPHONE": "Microphone",
+        "CONSOLE": "Console",
+        "INTERFACE": "Interface",
+        "MONITOR": "Monitor",
+        "INSTRUMENT": "Instrument",
+        "CABLE": "Cable",
+        "OTHER": "Other"
+      },
+      "status": {
+        "AVAILABLE": "Available",
+        "IN_USE": "In use",
+        "MAINTENANCE": "Maintenance",
+        "RETIRED": "Retired"
+      },
+      "table": {
+        "name": "Name",
+        "category": "Category",
+        "studio": "Studio",
+        "status": "Status",
+        "value": "Residual value",
+        "actions": "Actions"
+      },
+      "form": {
+        "create_title": "New equipment",
+        "edit_title": "Edit equipment",
+        "name": "Name",
+        "name_error": "Name must be between 2 and 200 characters.",
+        "category": "Category",
+        "status": "Status",
+        "studio": "Assigned studio",
+        "no_studio": "No studio",
+        "serial_number": "Serial number",
+        "brand": "Brand",
+        "model": "Model",
+        "location": "Location",
+        "warranty_until": "Warranty until",
+        "next_maintenance": "Next maintenance",
+        "purchase_date": "Purchase date",
+        "purchase_price": "Purchase price (MGA)",
+        "current_value": "Residual value (MGA)",
+        "notes": "Notes",
+        "save": "Save",
+        "cancel": "Cancel"
+      }
+    },
+    "maintenance": {
+      "title": "Maintenance history",
+      "empty": "No maintenance recorded.",
+      "add": "Add an intervention",
+      "description": "Intervention description",
+      "technician": "Technician",
+      "cost": "Cost (MGA)",
+      "parts": "Parts replaced",
+      "record": "Record"
+    },
+    "consumables": {
+      "add": "New consumable",
+      "search_placeholder": "Search consumables...",
+      "low_stock_only": "Low stock only",
+      "low_stock": "Low stock",
+      "in_stock": "In stock",
+      "empty": "No consumables found.",
+      "total_suffix": "consumable(s)",
+      "adjust_error": "Insufficient stock for this adjustment.",
+      "table": {
+        "name": "Name",
+        "quantity": "Quantity",
+        "threshold": "Alert threshold",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "form": {
+        "create_title": "New consumable",
+        "edit_title": "Edit consumable",
+        "name": "Name",
+        "name_error": "Name must be between 2 and 200 characters.",
+        "unit": "Unit",
+        "quantity": "Quantity",
+        "threshold": "Alert threshold",
+        "notes": "Notes",
+        "save": "Save",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "billing": {
+    "add": "New invoice",
+    "search_placeholder": "Search an invoice...",
+    "all_statuses": "All statuses",
+    "empty": "No invoices found.",
+    "total_suffix": "invoice(s)",
+    "kpi": {
+      "invoiced": "Invoiced",
+      "paid": "Collected",
+      "outstanding": "Outstanding",
+      "overdue": "Overdue"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "SENT": "Sent",
+      "PARTIAL": "Partial",
+      "PAID": "Paid",
+      "OVERDUE": "Overdue",
+      "CANCELLED": "Cancelled"
+    },
+    "method": {
+      "CASH": "Cash",
+      "MOBILE_MONEY": "Mobile Money",
+      "BANK_TRANSFER": "Bank transfer",
+      "CARD": "Card",
+      "OTHER": "Other"
+    },
+    "table": {
+      "reference": "Reference",
+      "client": "Client",
+      "status": "Status",
+      "total": "Total",
+      "balance": "Balance",
+      "due_date": "Due date"
+    },
+    "totals": {
+      "subtotal": "Subtotal",
+      "tax": "VAT",
+      "total": "Total"
+    },
+    "form": {
+      "create_title": "New invoice",
+      "back": "Back to invoices",
+      "client": "Client",
+      "select_client": "Select a client",
+      "project": "Linked project",
+      "no_project": "No project",
+      "items": "Invoice lines",
+      "add_item": "Add a line",
+      "item_description": "Description",
+      "item_quantity": "Qty",
+      "item_unit_price": "Unit price",
+      "remove_item": "Remove line",
+      "tax_rate": "VAT (%)",
+      "due_date": "Due date",
+      "notes": "Notes",
+      "save": "Create invoice",
+      "cancel": "Cancel",
+      "error": "An error occurred while saving."
+    },
+    "detail": {
+      "payments": "Payments",
+      "no_payments": "No payment recorded.",
+      "add_payment": "Record a payment",
+      "amount": "Amount",
+      "record": "Record",
+      "change_status": "Change status",
+      "delete": "Delete",
+      "pdf": "Download PDF",
+      "pdf_title": "INVOICE"
+    },
+    "sign": {
+      "action": "Get signed",
+      "title": "Electronic signature",
+      "hint": "Sign below with the mouse or finger. The invoice will be locked.",
+      "signer": "Signer name",
+      "clear": "Clear",
+      "cancel": "Cancel",
+      "confirm": "Confirm signature",
+      "signed_title": "Signed"
+    }
+  },
+  "finance": {
+    "title": "Billing & Finance",
+    "tabs": {
+      "invoices": "Invoices",
+      "treasury": "Treasury & Expenses"
+    },
+    "inflow": "Inflow",
+    "outflow": "Outflow",
+    "balance": "Balance",
+    "expected": "Forecast",
+    "cashflow": "Cash flow (6 months)",
+    "by_category": "Expenses by category",
+    "empty": "No expense recorded.",
+    "add_expense": "New expense",
+    "expense_label": "Label",
+    "expense_category": "Category",
+    "expense_date": "Date",
+    "amount": "Amount",
+    "add": "Add",
+    "category": {
+      "SALARY": "Salaries",
+      "RENT": "Rent",
+      "INTERNET": "Internet",
+      "ELECTRICITY": "Electricity",
+      "MAINTENANCE": "Maintenance",
+      "TAX": "Taxes",
+      "EQUIPMENT": "Equipment",
+      "SUPPLIES": "Supplies",
+      "OTHER": "Other"
+    }
+  },
+  "reporting": {
+    "tiles": {
+      "invoiced": "Invoiced",
+      "paid": "Collected",
+      "outstanding": "Outstanding",
+      "clients": "Clients",
+      "projects": "Projects",
+      "bookings": "Upcoming bookings",
+      "low_stock": "Low stock"
+    },
+    "revenue_by_month": "Revenue collected (6 months)",
+    "projects_by_status": "Projects by status",
+    "top_clients": "Top clients",
+    "equipment_by_status": "Equipment by status"
+  },
+  "settings": {
+    "saved": "Saved",
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "Choose the interface theme."
+    },
+    "theme": {
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System",
+      "dark_hint": "Always dark interface.",
+      "light_hint": "Always light interface.",
+      "system_hint": "Follows the system setting."
+    },
+    "language": {
+      "title": "Language",
+      "subtitle": "Interface language."
+    },
+    "profile": {
+      "title": "Profile",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "phone": "Phone",
+      "save": "Save",
+      "error": "An error occurred while saving."
+    },
+    "account": {
+      "title": "Account",
+      "email": "Email",
+      "member_since": "Member since",
+      "roles": "Roles",
+      "two_factor": "Two-factor authentication",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "security": {
+      "title": "Security — Two-factor authentication",
+      "subtitle": "Add a security layer with an authenticator app (Google Authenticator, Authy…).",
+      "enable": "Enable 2FA",
+      "enabled": "Enabled",
+      "disable": "Disable",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "scan_hint": "Enter this key in your authenticator app, then type the generated 6-digit code.",
+      "secret": "Secret key",
+      "code_placeholder": "6-digit code",
+      "error": "Invalid code, try again."
     }
   }
 }

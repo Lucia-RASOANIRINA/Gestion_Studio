@@ -4,16 +4,48 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
 
-:root {
+/*
+ * Palette thématisée : les variables contiennent des canaux RVB (ex. "15 15 18")
+ * consommés par Tailwind via rgb(var(--x) / <alpha-value>). Le thème sombre est la
+ * valeur par défaut ; `.theme-light` sur <html> bascule vers le thème clair.
+ */
+:root,
+.theme-dark {
   color-scheme: dark;
+  --gs-black: 15 15 18;
+  --gs-dark-gray: 26 26 33;
+  --gs-blue: 0 212 255;
+  --gs-violet: 139 92 246;
+  --gs-green: 0 255 159;
+  --gs-orange: 255 107 53;
+  --gs-light: 224 224 229;
+  --gs-navy: 30 42 68;
+  --gs-dark-violet: 76 29 149;
+  --gs-border: 42 42 51;
+  --gs-hover: 38 38 46;
+}
+
+.theme-light {
+  color-scheme: light;
+  --gs-black: 244 245 247; /* fond de page */
+  --gs-dark-gray: 255 255 255; /* panneaux / barre latérale */
+  --gs-blue: 8 145 178; /* accent lisible sur fond clair */
+  --gs-violet: 124 58 237;
+  --gs-green: 5 150 105;
+  --gs-orange: 234 88 12;
+  --gs-light: 26 26 33; /* texte principal */
+  --gs-navy: 224 236 247; /* fond d'élément actif */
+  --gs-dark-violet: 109 40 217;
+  --gs-border: 224 227 233;
+  --gs-hover: 237 240 245;
 }
 
 html,
 body {
   height: 100%;
   margin: 0;
-  background-color: #0f0f12;
-  color: #e0e0e5;
+  background-color: rgb(var(--gs-black));
+  color: rgb(var(--gs-light));
   font-family: "Inter", sans-serif;
 }
 
@@ -24,4 +56,20 @@ h4,
 h5,
 h6 {
   font-family: "Space Grotesk", sans-serif;
+}
+
+/* Impression (génération PDF via le navigateur) : fond blanc, tout visible. */
+@media print {
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  main {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
 }

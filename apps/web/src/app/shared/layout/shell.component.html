@@ -7,72 +7,176 @@
   }
 
   <aside
-    class="fixed inset-y-0 left-0 z-30 w-64 flex-shrink-0 bg-gs-dark-gray border-r border-white/5 flex flex-col transition-transform duration-200 ease-in-out lg:static"
+    class="fixed inset-y-0 left-0 z-30 w-64 flex-shrink-0 bg-gs-dark-gray border-r border-gs-border flex flex-col transition-transform duration-200 ease-in-out lg:static print:hidden"
     [ngClass]="{ 'max-lg:-translate-x-full': !sidebarOpen() }"
   >
-    <div class="px-5 py-6 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <gs-icon name="logo" [size]="22" class="text-gs-blue" />
-        <h1 class="font-display text-xl font-semibold text-gs-blue">{{ 'app.title' | translate }}</h1>
+    <div class="px-5 py-6 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <gs-icon name="logo" [size]="22" class="text-gs-blue flex-shrink-0" />
+        <h1 class="font-display text-xl font-semibold text-gs-blue truncate">{{ 'app.title' | translate }}</h1>
       </div>
       <button
         type="button"
         class="text-gs-light/60 hover:text-gs-light lg:hidden"
         (click)="toggleSidebar()"
+        [attr.aria-label]="'nav.close' | translate"
       >
         <gs-icon name="close" [size]="20" />
       </button>
     </div>
+
     <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
       @for (item of navItems; track item.path) {
         <a
           [routerLink]="item.path"
           routerLinkActive="bg-gs-navy text-gs-blue"
-          class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gs-light/80 hover:bg-gs-navy hover:text-gs-blue transition-colors"
+          class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gs-light/80 hover:bg-gs-hover hover:text-gs-blue transition-colors"
         >
           <gs-icon [name]="item.icon" [size]="18" />
           <span>{{ item.labelKey | translate }}</span>
         </a>
       }
     </nav>
-    <div class="p-3 border-t border-white/5 flex items-center justify-between">
-      <div class="flex items-center gap-1 text-gs-light/60">
-        <gs-icon name="language" [size]="16" />
-        <button
-          type="button"
-          class="text-xs px-2 py-1 rounded hover:bg-gs-navy hover:text-gs-light"
-          (click)="useLanguage('fr')"
-        >
-          FR
-        </button>
-        <button
-          type="button"
-          class="text-xs px-2 py-1 rounded hover:bg-gs-navy hover:text-gs-light"
-          (click)="useLanguage('en')"
-        >
-          EN
-        </button>
+
+    <div class="border-t border-gs-border p-3 space-y-3">
+      @if (userName()) {
+        <a routerLink="/settings" class="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-gs-hover">
+          <span class="flex h-8 w-8 items-center justify-center rounded-full bg-gs-navy text-gs-blue">
+            <gs-icon name="user" [size]="16" />
+          </span>
+          <span class="min-w-0 flex-1 truncate text-sm">{{ userName() }}</span>
+        </a>
+      }
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1 text-gs-light/60">
+          <gs-icon name="language" [size]="16" />
+          <button
+            type="button"
+            class="text-xs px-2 py-1 rounded hover:bg-gs-hover"
+            [class.text-gs-blue]="currentLang() === 'fr'"
+            [class.font-semibold]="currentLang() === 'fr'"
+            (click)="useLanguage('fr')"
+          >
+            FR
+          </button>
+          <button
+            type="button"
+            class="text-xs px-2 py-1 rounded hover:bg-gs-hover"
+            [class.text-gs-blue]="currentLang() === 'en'"
+            [class.font-semibold]="currentLang() === 'en'"
+            (click)="useLanguage('en')"
+          >
+            EN
+          </button>
+        </div>
+
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            class="relative flex items-center justify-center h-8 w-8 rounded-md text-gs-light/70 hover:bg-gs-hover hover:text-gs-blue"
+            (click)="toggleNotif()"
+            [attr.aria-label]="'notifications.title' | translate"
+          >
+            <gs-icon name="bell" [size]="16" />
+            @if (notifications.count() > 0) {
+              <span class="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-gs-orange px-1 text-[10px] font-bold text-gs-black">{{ notifications.count() }}</span>
+            }
+          </button>
+          <button
+            type="button"
+            class="flex items-center justify-center h-8 w-8 rounded-md text-gs-light/70 hover:bg-gs-hover hover:text-gs-blue"
+            (click)="toggleTheme()"
+            [attr.aria-label]="'settings.appearance.title' | translate"
+          >
+            <gs-icon [name]="isLight() ? 'moon' : 'sun'" [size]="16" />
+          </button>
+        </div>
       </div>
+
       <button
         type="button"
-        class="flex items-center gap-1 text-xs px-2 py-1 rounded text-gs-orange hover:bg-gs-navy"
+        class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs text-gs-orange hover:bg-gs-hover"
         (click)="logout()"
       >
         <gs-icon name="logout" [size]="14" />
-        Logout
+        {{ 'nav.logout' | translate }}
       </button>
     </div>
   </aside>
 
   <div class="flex-1 flex flex-col min-w-0">
-    <header class="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-white/5 bg-gs-dark-gray">
-      <button type="button" class="text-gs-light/80 hover:text-gs-blue" (click)="toggleSidebar()">
-        <gs-icon name="menu" [size]="22" />
-      </button>
-      <span class="font-display text-lg font-semibold text-gs-blue">{{ 'app.title' | translate }}</span>
+    <header class="lg:hidden flex items-center justify-between gap-3 px-4 py-3 border-b border-gs-border bg-gs-dark-gray print:hidden">
+      <div class="flex items-center gap-3 min-w-0">
+        <button
+          type="button"
+          class="text-gs-light/80 hover:text-gs-blue flex-shrink-0"
+          (click)="toggleSidebar()"
+          [attr.aria-label]="'nav.menu' | translate"
+        >
+          <gs-icon name="menu" [size]="22" />
+        </button>
+        <span class="font-display text-base sm:text-lg font-semibold text-gs-blue truncate">{{ 'app.title' | translate }}</span>
+      </div>
+      <div class="flex flex-shrink-0 items-center gap-1">
+        <button
+          type="button"
+          class="relative flex items-center justify-center h-9 w-9 rounded-md text-gs-light/70 hover:bg-gs-hover hover:text-gs-blue"
+          (click)="toggleNotif()"
+          [attr.aria-label]="'notifications.title' | translate"
+        >
+          <gs-icon name="bell" [size]="18" />
+          @if (notifications.count() > 0) {
+            <span class="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-gs-orange px-1 text-[10px] font-bold text-gs-black">{{ notifications.count() }}</span>
+          }
+        </button>
+        <button
+          type="button"
+          class="flex items-center justify-center h-9 w-9 rounded-md text-gs-light/70 hover:bg-gs-hover hover:text-gs-blue"
+          (click)="toggleTheme()"
+          [attr.aria-label]="'settings.appearance.title' | translate"
+        >
+          <gs-icon [name]="isLight() ? 'moon' : 'sun'" [size]="18" />
+        </button>
+      </div>
     </header>
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
       <router-outlet></router-outlet>
     </main>
   </div>
+
+  <!-- Panneau de notifications -->
+  @if (notifOpen()) {
+    <div class="fixed inset-0 z-40" (click)="notifOpen.set(false)"></div>
+    <div class="fixed z-50 top-16 right-4 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-gs-border bg-gs-dark-gray shadow-xl print:hidden">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gs-border">
+        <h3 class="font-display font-semibold">{{ 'notifications.title' | translate }}</h3>
+        <span class="text-xs text-gs-light/50">{{ notifications.count() }}</span>
+      </div>
+      @if (notifications.items().length === 0) {
+        <p class="px-4 py-6 text-sm text-gs-light/50 text-center">{{ 'notifications.empty' | translate }}</p>
+      } @else {
+        <ul class="max-h-96 overflow-y-auto divide-y divide-gs-border">
+          @for (n of notifications.items(); track $index) {
+            <a
+              [routerLink]="notifications.routeFor(n)"
+              (click)="notifOpen.set(false)"
+              class="flex items-start gap-3 px-4 py-3 hover:bg-gs-hover"
+            >
+              <span
+                class="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full"
+                [class]="n.severity === 'danger' ? 'bg-gs-orange/15 text-gs-orange' : (n.severity === 'warning' ? 'bg-gs-orange/10 text-gs-orange' : 'bg-gs-navy text-gs-blue')"
+              >
+                <gs-icon name="alert" [size]="14" />
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm truncate">{{ n.title }}</p>
+                <p class="text-xs text-gs-light/50">{{ ('notifications.type.' + n.type) | translate }}</p>
+              </div>
+            </a>
+          }
+        </ul>
+      }
+    </div>
+  }
 </div>

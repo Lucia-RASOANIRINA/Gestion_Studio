@@ -11,7 +11,10 @@
     "conflict": "Cette action entre en conflit avec une ressource existante.",
     "booking_conflict": "Ce créneau est en conflit avec une ou plusieurs réservations existantes (même studio ou même ingénieur).",
     "invalid_booking_duration": "La durée de la réservation doit être un multiple de 15 minutes.",
-    "booking_in_past": "Une réservation ne peut pas être prise dans le passé."
+    "booking_in_past": "Une réservation ne peut pas être prise dans le passé.",
+    "duplicate_entry": "Une ressource avec ces informations existe déjà.",
+    "referenced_record_missing": "Cette opération référence une ressource inexistante ou déjà utilisée ailleurs.",
+    "insufficient_stock": "Stock insuffisant pour cet ajustement."
   },
   "auth": {
     "login_success": "Connexion réussie.",

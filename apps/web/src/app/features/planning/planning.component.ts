@@ -1,8 +1,9 @@
 import { Component, OnInit, computed, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
-import { TranslateModule } from "@ngx-translate/core";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
+import { resolveErrorMessageKey } from "../../shared/http-error.util";
 import {
   addDays,
   addMonths,
@@ -26,6 +27,7 @@ type ViewMode = "day" | "week" | "month";
 })
 export class PlanningComponent implements OnInit {
   private readonly planningService = inject(PlanningService);
+  private readonly translate = inject(TranslateService);
 
   readonly studios = STUDIO_ROOMS;
   readonly view = signal<ViewMode>("day");
@@ -33,6 +35,7 @@ export class PlanningComponent implements OnInit {
   readonly studioFilter = signal<StudioRoom | "">("");
   readonly bookings = signal<Booking[]>([]);
   readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
 
   readonly weekDays = computed(() => {
     const start = startOfWeek(this.refDate());
@@ -74,6 +77,7 @@ export class PlanningComponent implements OnInit {
 
   async load(): Promise<void> {
     this.loading.set(true);
+    this.error.set(null);
     try {
       const { from, to } = this.currentRange();
       const bookings = await this.planningService.list({
@@ -82,6 +86,8 @@ export class PlanningComponent implements OnInit {
         studio: this.studioFilter() || undefined,
       });
       this.bookings.set(bookings);
+    } catch (error) {
+      this.error.set(resolveErrorMessageKey(error));
     } finally {
       this.loading.set(false);
     }
@@ -157,8 +163,12 @@ export class PlanningComponent implements OnInit {
   async remove(booking: Booking, event: Event): Promise<void> {
     event.stopPropagation();
     if (!confirm(`Supprimer "${booking.title}" ?`)) return;
-    await this.planningService.remove(booking.id);
-    await this.load();
+    try {
+      await this.planningService.remove(booking.id);
+      await this.load();
+    } catch (error) {
+      alert(this.translate.instant(resolveErrorMessageKey(error)));
+    }
   }
 
   downloadIcs(booking: Booking, event: Event): void {

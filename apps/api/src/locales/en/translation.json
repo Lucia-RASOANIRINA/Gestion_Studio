@@ -11,7 +11,10 @@
     "conflict": "This action conflicts with an existing resource.",
     "booking_conflict": "This time slot conflicts with one or more existing bookings (same studio or same engineer).",
     "invalid_booking_duration": "Booking duration must be a multiple of 15 minutes.",
-    "booking_in_past": "A booking cannot be scheduled in the past."
+    "booking_in_past": "A booking cannot be scheduled in the past.",
+    "duplicate_entry": "A resource with this information already exists.",
+    "referenced_record_missing": "This operation references a resource that does not exist or is already in use elsewhere.",
+    "insufficient_stock": "Insufficient stock for this adjustment."
   },
   "auth": {
     "login_success": "Login successful.",

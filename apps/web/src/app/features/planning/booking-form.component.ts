@@ -1,9 +1,9 @@
-import { HttpErrorResponse } from "@angular/common/http";
 import { Component, OnInit, inject, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { TranslateModule } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
+import { resolveErrorMessageKey } from "../../shared/http-error.util";
 import type { Project } from "../projects/project.model";
 import { ProjectsService } from "../projects/projects.service";
 import { toDateTimeLocalValue } from "./date-utils";
@@ -43,12 +43,16 @@ export class BookingFormComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
-    const [{ items: projects }, engineers] = await Promise.all([
-      this.projectsService.list({ pageSize: 100 }),
-      this.planningService.listEngineers(),
-    ]);
-    this.projects.set(projects);
-    this.engineers.set(engineers);
+    try {
+      const [{ items: projects }, engineers] = await Promise.all([
+        this.projectsService.list({ pageSize: 100 }),
+        this.planningService.listEngineers(),
+      ]);
+      this.projects.set(projects);
+      this.engineers.set(engineers);
+    } catch {
+      this.serverError.set("common.errors.network");
+    }
 
     const id = this.route.snapshot.paramMap.get("id");
     if (!id) {
@@ -64,17 +68,21 @@ export class BookingFormComponent implements OnInit {
     }
 
     this.bookingId.set(id);
-    const booking = await this.planningService.getById(id);
-    this.form.patchValue({
-      studio: booking.studio,
-      type: booking.type,
-      title: booking.title,
-      startAt: toDateTimeLocalValue(new Date(booking.startAt)),
-      endAt: toDateTimeLocalValue(new Date(booking.endAt)),
-      projectId: booking.project?.id ?? "",
-      engineerId: booking.engineer?.id ?? "",
-      notes: booking.notes ?? "",
-    });
+    try {
+      const booking = await this.planningService.getById(id);
+      this.form.patchValue({
+        studio: booking.studio,
+        type: booking.type,
+        title: booking.title,
+        startAt: toDateTimeLocalValue(new Date(booking.startAt)),
+        endAt: toDateTimeLocalValue(new Date(booking.endAt)),
+        projectId: booking.project?.id ?? "",
+        engineerId: booking.engineer?.id ?? "",
+        notes: booking.notes ?? "",
+      });
+    } catch {
+      await this.router.navigateByUrl("/planning");
+    }
   }
 
   async submit(): Promise<void> {
@@ -105,13 +113,12 @@ export class BookingFormComponent implements OnInit {
       }
       await this.router.navigateByUrl("/planning");
     } catch (error) {
-      if (error instanceof HttpErrorResponse && error.status === 409) {
-        this.serverError.set("planning.form.conflict_error");
-      } else if (error instanceof HttpErrorResponse && error.status === 400) {
-        this.serverError.set("planning.form.validation_error");
-      } else {
-        this.serverError.set("planning.form.error");
-      }
+      this.serverError.set(
+        resolveErrorMessageKey(error, {
+          409: "planning.form.conflict_error",
+          400: "planning.form.validation_error",
+        })
+      );
     } finally {
       this.saving.set(false);
     }

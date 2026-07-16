@@ -3,7 +3,9 @@ import {
   LucideAlertTriangle,
   LucideArrowLeft,
   LucideBarChart3,
+  LucideBell,
   LucideBoxes,
+  LucideBuilding2,
   LucideCalendarDays,
   LucideCheck,
   LucideChevronLeft,
@@ -16,13 +18,17 @@ import {
   LucideLogOut,
   LucideMail,
   LucideMenu,
+  LucideMinus,
+  LucideMoon,
   LucideMusic,
   LucidePencil,
   LucidePlus,
   LucideReceipt,
   LucideSearch,
   LucideSettings,
+  LucideSun,
   LucideTrash2,
+  LucideUser,
   LucideUsers,
   LucideX,
 } from "@lucide/angular";
@@ -52,7 +58,13 @@ export type IconName =
   | "prev"
   | "next"
   | "download"
-  | "alert";
+  | "alert"
+  | "minus"
+  | "sun"
+  | "moon"
+  | "user"
+  | "bell"
+  | "studios";
 
 @Component({
   selector: "gs-icon",
@@ -83,6 +95,12 @@ export type IconName =
     LucideChevronRight,
     LucideDownload,
     LucideAlertTriangle,
+    LucideMinus,
+    LucideSun,
+    LucideMoon,
+    LucideUser,
+    LucideBell,
+    LucideBuilding2,
   ],
   template: `
     @switch (name()) {
@@ -160,6 +178,24 @@ export type IconName =
       }
       @case ("alert") {
         <svg lucideAlertTriangle [size]="size()"></svg>
+      }
+      @case ("minus") {
+        <svg lucideMinus [size]="size()"></svg>
+      }
+      @case ("sun") {
+        <svg lucideSun [size]="size()"></svg>
+      }
+      @case ("moon") {
+        <svg lucideMoon [size]="size()"></svg>
+      }
+      @case ("user") {
+        <svg lucideUser [size]="size()"></svg>
+      }
+      @case ("bell") {
+        <svg lucideBell [size]="size()"></svg>
+      }
+      @case ("studios") {
+        <svg lucideBuilding2 [size]="size()"></svg>
       }
     }
   `,

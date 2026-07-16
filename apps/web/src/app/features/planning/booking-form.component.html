@@ -10,14 +10,14 @@
 <form
   [formGroup]="form"
   (ngSubmit)="submit()"
-  class="max-w-2xl bg-gs-dark-gray border border-white/5 rounded-xl p-6 space-y-4"
+  class="max-w-2xl bg-gs-dark-gray border border-gs-border rounded-xl p-6 space-y-4"
 >
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
     <div>
       <label class="block text-sm text-gs-light/70 mb-1">{{ 'planning.form.studio' | translate }}</label>
       <select
         formControlName="studio"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       >
         @for (studio of studios; track studio) {
           <option [value]="studio">{{ ('planning.studio.' + studio) | translate }}</option>
@@ -28,7 +28,7 @@
       <label class="block text-sm text-gs-light/70 mb-1">{{ 'planning.form.type' | translate }}</label>
       <select
         formControlName="type"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       >
         @for (type of types; track type) {
           <option [value]="type">{{ ('planning.type.' + type) | translate }}</option>
@@ -42,7 +42,7 @@
     <input
       type="text"
       formControlName="title"
-      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     />
     @if (form.controls.title.invalid && form.controls.title.touched) {
       <p class="text-gs-orange text-xs mt-1">{{ 'planning.form.title_error' | translate }}</p>
@@ -55,7 +55,7 @@
       <input
         type="datetime-local"
         formControlName="startAt"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       />
     </div>
     <div>
@@ -63,7 +63,7 @@
       <input
         type="datetime-local"
         formControlName="endAt"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       />
     </div>
   </div>
@@ -74,7 +74,7 @@
       <label class="block text-sm text-gs-light/70 mb-1">{{ 'planning.form.project' | translate }}</label>
       <select
         formControlName="projectId"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       >
         <option value="">{{ 'planning.form.no_project' | translate }}</option>
         @for (project of projects(); track project.id) {
@@ -86,7 +86,7 @@
       <label class="block text-sm text-gs-light/70 mb-1">{{ 'planning.form.engineer' | translate }}</label>
       <select
         formControlName="engineerId"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       >
         <option value="">{{ 'planning.form.no_engineer' | translate }}</option>
         @for (engineer of engineers(); track engineer.id) {
@@ -101,7 +101,7 @@
     <textarea
       formControlName="notes"
       rows="3"
-      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     ></textarea>
   </div>
 
