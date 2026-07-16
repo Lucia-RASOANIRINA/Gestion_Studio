@@ -1,0 +1,155 @@
+<div>
+  <div class="flex items-center gap-2 mb-4">
+    <gs-icon name="billing" [size]="22" class="text-gs-blue" />
+    <h2 class="font-display text-2xl font-semibold">{{ 'finance.title' | translate }}</h2>
+  </div>
+
+  <!-- Onglets Facturation / Finances -->
+  <div class="flex gap-2 mb-6 border-b border-gs-border">
+    <a routerLink="/billing" class="px-4 py-2 text-sm text-gs-light/60 hover:text-gs-light">{{ 'finance.tabs.invoices' | translate }}</a>
+    <span class="px-4 py-2 text-sm font-semibold text-gs-blue border-b-2 border-gs-blue">{{ 'finance.tabs.treasury' | translate }}</span>
+  </div>
+
+  @if (loading()) {
+    <p class="text-gs-light/60">{{ 'common.loading' | translate }}</p>
+  } @else {
+    @if (treasury(); as t) {
+    <!-- Synthèse trésorerie -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+        <p class="text-xs uppercase tracking-wide text-gs-light/50">{{ 'finance.inflow' | translate }}</p>
+        <p class="mt-1 font-display text-xl font-semibold text-gs-green">{{ t.inflow | number }} <span class="text-sm text-gs-light/40">MGA</span></p>
+      </div>
+      <div class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+        <p class="text-xs uppercase tracking-wide text-gs-light/50">{{ 'finance.outflow' | translate }}</p>
+        <p class="mt-1 font-display text-xl font-semibold text-gs-orange">{{ t.outflow | number }} <span class="text-sm text-gs-light/40">MGA</span></p>
+      </div>
+      <div class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+        <p class="text-xs uppercase tracking-wide text-gs-light/50">{{ 'finance.balance' | translate }}</p>
+        <p class="mt-1 font-display text-xl font-semibold" [class]="t.balance >= 0 ? 'text-gs-blue' : 'text-gs-orange'">
+          {{ t.balance | number }} <span class="text-sm text-gs-light/40">MGA</span>
+        </p>
+      </div>
+      <div class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+        <p class="text-xs uppercase tracking-wide text-gs-light/50">{{ 'finance.expected' | translate }}</p>
+        <p class="mt-1 font-display text-xl font-semibold text-gs-violet">{{ t.expectedInflow | number }} <span class="text-sm text-gs-light/40">MGA</span></p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <!-- Flux mensuel -->
+      <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+        <h3 class="font-display text-lg font-semibold mb-4">{{ 'finance.cashflow' | translate }}</h3>
+        <div class="space-y-3">
+          @for (m of t.cashflowByMonth; track m.month) {
+            <div>
+              <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+                <span>{{ m.month }}</span>
+                <span><span class="text-gs-green">+{{ m.inflow | number }}</span> / <span class="text-gs-orange">-{{ m.outflow | number }}</span></span>
+              </div>
+              <div class="flex gap-1">
+                <div class="h-2 rounded-full bg-gs-green" [style.width]="barWidth(m.inflow, maxCashflow())"></div>
+                <div class="h-2 rounded-full bg-gs-orange" [style.width]="barWidth(m.outflow, maxCashflow())"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Dépenses par catégorie -->
+      <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+        <h3 class="font-display text-lg font-semibold mb-4">{{ 'finance.by_category' | translate }}</h3>
+        @if (t.expensesByCategory.length === 0) {
+          <p class="text-sm text-gs-light/50">{{ 'finance.empty' | translate }}</p>
+        } @else {
+          <div class="space-y-3">
+            @for (c of t.expensesByCategory; track c.category) {
+              <div>
+                <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+                  <span>{{ ('finance.category.' + c.category) | translate }}</span>
+                  <span>{{ c.amount | number }} MGA</span>
+                </div>
+                <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+                  <div class="h-full rounded-full bg-gs-orange" [style.width]="barWidth(c.amount, maxCategory())"></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+    </div>
+
+    <!-- Nouvelle dépense -->
+    <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5 mb-6">
+      <h3 class="font-display text-lg font-semibold mb-3">{{ 'finance.add_expense' | translate }}</h3>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input
+          type="text"
+          [ngModel]="newLabel()"
+          (ngModelChange)="newLabel.set($event)"
+          [placeholder]="'finance.expense_label' | translate"
+          class="flex-1 rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+        />
+        <select
+          [ngModel]="newCategory()"
+          (ngModelChange)="newCategory.set($event)"
+          class="rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+        >
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ ('finance.category.' + cat) | translate }}</option>
+          }
+        </select>
+        <input
+          type="number"
+          min="0"
+          [ngModel]="newAmount()"
+          (ngModelChange)="newAmount.set($event)"
+          [placeholder]="'finance.amount' | translate"
+          class="w-full sm:w-40 rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+        />
+        <button
+          type="button"
+          (click)="addExpense()"
+          [disabled]="saving()"
+          class="inline-flex items-center gap-1 rounded-md bg-gs-blue px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90 disabled:opacity-50"
+        >
+          <gs-icon name="add" [size]="16" />
+          {{ 'finance.add' | translate }}
+        </button>
+      </div>
+    </section>
+
+    <!-- Liste des dépenses -->
+    <section class="rounded-lg border border-gs-border overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gs-dark-gray text-left text-xs uppercase tracking-wide text-gs-light/50">
+          <tr>
+            <th class="px-4 py-3">{{ 'finance.expense_label' | translate }}</th>
+            <th class="px-4 py-3">{{ 'finance.expense_category' | translate }}</th>
+            <th class="px-4 py-3">{{ 'finance.expense_date' | translate }}</th>
+            <th class="px-4 py-3 text-right">{{ 'finance.amount' | translate }}</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (expense of expenses(); track expense.id) {
+            <tr class="border-b border-gs-border last:border-0">
+              <td class="px-4 py-3">{{ expense.label }}</td>
+              <td class="px-4 py-3 text-gs-light/70">{{ ('finance.category.' + expense.category) | translate }}</td>
+              <td class="px-4 py-3 text-gs-light/70">{{ expense.incurredAt | date: 'shortDate' }}</td>
+              <td class="px-4 py-3 text-right text-gs-orange">{{ expense.amount | number }}</td>
+              <td class="px-4 py-3 text-right">
+                <button type="button" class="text-gs-light/50 hover:text-gs-orange" (click)="removeExpense(expense)">
+                  <gs-icon name="delete" [size]="15" />
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="px-4 py-6 text-center text-gs-light/50">{{ 'finance.empty' | translate }}</td></tr>
+          }
+        </tbody>
+      </table>
+    </section>
+    }
+  }
+</div>

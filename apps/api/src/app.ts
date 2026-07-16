@@ -11,7 +11,11 @@ import { clientsRouter } from "./modules/clients/clients.routes";
 import { projectsRouter } from "./modules/projects/projects.routes";
 import { planningRouter } from "./modules/planning/planning.routes";
 import { resourcesRouter } from "./modules/resources/resources.routes";
+import { studiosRouter } from "./modules/studios/studios.routes";
+import { hrRouter } from "./modules/hr/hr.routes";
+import { notificationsRouter } from "./modules/notifications/notifications.routes";
 import { billingRouter } from "./modules/billing/billing.routes";
+import { financeRouter } from "./modules/finance/finance.routes";
 import { reportingRouter } from "./modules/reporting/reporting.routes";
 import { settingsRouter } from "./modules/settings/settings.routes";
 
@@ -33,7 +37,11 @@ app.use("/api/clients", clientsRouter);
 app.use("/api/projects", projectsRouter);
 app.use("/api/planning", planningRouter);
 app.use("/api/resources", resourcesRouter);
+app.use("/api/studios", studiosRouter);
+app.use("/api/hr", hrRouter);
+app.use("/api/notifications", notificationsRouter);
 app.use("/api/billing", billingRouter);
+app.use("/api/finance", financeRouter);
 app.use("/api/reporting", reportingRouter);
 app.use("/api/settings", settingsRouter);
 
