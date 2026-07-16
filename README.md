@@ -5,7 +5,7 @@ Plateforme de gestion de services pour une maison de production audio basée à 
 ## Stack technique
 
 - **Backend** : Node.js + Express (TypeScript), architecture modulaire par domaine
-- **Frontend** : Angular (TypeScript), thème sombre, TailwindCSS, i18n FR/EN
+- **Frontend** : Angular (TypeScript), thème clair/sombre, TailwindCSS, i18n FR/EN, responsive
 - **Base de données** : PostgreSQL + Prisma ORM
 - **Cache / files d'attente** : Redis
 - **Stockage fichiers** : MinIO (compatible S3) en local/dev
@@ -89,7 +89,7 @@ npm run prisma:migrate
 npm run prisma:seed
 ```
 
-Cela crée les 7 rôles par défaut, un compte par rôle, 8 clients, 10 projets et 7 réservations de test (voir [apps/api/README.md](apps/api/README.md) pour la liste complète des comptes).
+Cela crée les 7 rôles par défaut, un compte par rôle, 8 clients, 10 projets, 7 réservations, le matériel et les consommables, 5 studios, 5 employés (avec congés), des factures et des dépenses de démonstration (voir [apps/api/README.md](apps/api/README.md) pour la liste complète des comptes).
 
 ### 8. Lancer le backend et le frontend (dans deux terminaux séparés)
 
@@ -156,10 +156,27 @@ Tests unitaires sur la logique métier : validation (téléphone malgache, e-mai
 
 ---
 
+## Fonctionnalités
+
+- **Fondations** : authentification JWT (access + refresh avec rotation), RBAC administrable (rôles × permissions en base), i18n FR/EN complet, **thème clair/sombre** commutable et persisté (par variables CSS), interface **responsive** (mobile → desktop).
+- **Tableau de bord** : 12 KPIs (projets en cours/terminés, revenus du mois/annuels, nouveaux clients, taux d'occupation studio, durée moyenne de projet, réservations du jour/semaine, encours de paiement…), 6 graphiques d'évolution/répartition (revenus, réservations, nouveaux clients, services les plus demandés, revenus par service, top clients) et un **flux d'activités récentes** issu du journal d'audit.
+- **Clients & Contacts** : CRUD, segments, **programme de fidélité** (1 point / 10 000 Ar payés, niveaux Bronze/Silver/Gold/Platinum dérivés), **blacklist** (mauvais payeur, fraude…).
+- **Projets & Services** : CRUD, **workflow** de statuts, **pourcentage d'avancement**, **check-list avant livraison** et **chronologie (timeline)** visuelle des étapes.
+- **Planning & Réservations** : calendrier jour/semaine/mois, détection de conflits (studio/ingénieur), export iCal.
+- **Studios** : catalogue des salles (type, capacité, tarif horaire, statut, équipements, maintenance).
+- **Ressources** : matériel (marque, modèle, n° série, garantie, localisation, valeur, **historique de maintenance/réparations**) et consommables (stock, seuil d'alerte, ajustements).
+- **Facturation** : factures avec lignes, TVA, paiements multi-moyens (**Mobile Money**, virement, espèces, carte…), paiements partiels, statuts automatiques (brouillon/envoyée/partielle/payée/en retard/annulée), **génération PDF** (impression navigateur) et **signature électronique** (le client signe à la souris/tablette, facture verrouillée).
+- **Finances** : suivi des **dépenses** (salaires, loyer, électricité, taxes…) et **tableau de trésorerie** (entrées vs sorties, solde, prévisionnel, flux mensuel, répartition par catégorie).
+- **Reporting & Analytics** : CA encaissé par mois, projets/matériel par statut, top clients, indicateurs consolidés.
+- **Ressources Humaines** : employés & freelances, taux journalier, **congés / absences / heures supplémentaires** (workflow d'approbation).
+- **Notifications** : centre d'alertes calculées (stock bas, factures en retard, maintenance à prévoir) avec cloche et badge.
+- **Sécurité** : verrouillage anti-force brute, journal d'audit inaltérable, et **double authentification (2FA / TOTP)** compatible Google Authenticator / Authy.
+- **Paramètres** : profil, langue, sélecteur de thème, gestion de la 2FA.
+
 ## État du projet
 
-Implémenté et fonctionnel : **Fondations** (auth, RBAC, i18n, thème), **Clients & Contacts**, **Projets & Services** (workflow), **Planning & Réservations** (calendrier jour/semaine/mois, détection de conflits, export iCal).
+Toutes les fonctionnalités ci-dessus sont **implémentées et fonctionnelles** (front + back, tests et builds au vert).
 
-Restant (pages "à venir") : Ressources, Facturation & Finances, Reporting & Analytics, Paramètres, ainsi que les fonctionnalités transverses (portail client, mode hors-ligne, notifications, 2FA, application mobile).
+Pistes d'évolution futures : gestion documentaire (GED) avec versioning, lecteurs audio/vidéo à commentaires horodatés, notifications SMS/WhatsApp, messagerie interne, portail client dédié, synchronisation calendrier externe (Google/Outlook), sauvegardes automatiques, assistant IA, application mobile.
 
 Voir [CHANGELOG.md](CHANGELOG.md) pour le détail des évolutions. Chaque module possède son propre `README.md` (dans `apps/api/src/modules/<module>/`) documentant sa portée et son état d'avancement.
