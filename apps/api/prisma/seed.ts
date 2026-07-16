@@ -2,12 +2,23 @@ import {
   BookingType,
   ClientSegment,
   Currency,
+  EmployeeStatus,
+  EmployeeType,
+  EquipmentCategory,
+  EquipmentStatus,
+  ExpenseCategory,
+  InvoiceStatus,
+  LeaveStatus,
+  LeaveType,
+  PaymentMethod,
   PermissionAction,
   PermissionModule,
   PrismaClient,
   ProjectStatus,
   ServiceType,
   StudioRoom,
+  StudioStatus,
+  StudioType,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -375,6 +386,169 @@ const DEMO_PROJECTS: DemoProject[] = [
   },
 ];
 
+interface DemoEquipment {
+  name: string;
+  category: EquipmentCategory;
+  serialNumber: string;
+  status: EquipmentStatus;
+  studio?: StudioRoom;
+  purchaseDate: string;
+  purchasePrice: number;
+  currentValue: number;
+  notes?: string;
+}
+
+const DEMO_EQUIPMENT: DemoEquipment[] = [
+  {
+    name: "Neumann U87 Ai",
+    category: EquipmentCategory.MICROPHONE,
+    serialNumber: "NU87-000112",
+    status: EquipmentStatus.AVAILABLE,
+    studio: StudioRoom.STUDIO_A,
+    purchaseDate: "2022-03-15",
+    purchasePrice: 12000000,
+    currentValue: 9500000,
+    notes: "Micro de référence pour les voix lead.",
+  },
+  {
+    name: "Shure SM7B",
+    category: EquipmentCategory.MICROPHONE,
+    serialNumber: "SM7B-004521",
+    status: EquipmentStatus.IN_USE,
+    studio: StudioRoom.STUDIO_B,
+    purchaseDate: "2023-01-10",
+    purchasePrice: 1800000,
+    currentValue: 1500000,
+    notes: "Voix off et podcasts.",
+  },
+  {
+    name: "SSL SiX",
+    category: EquipmentCategory.CONSOLE,
+    serialNumber: "SSLSIX-00987",
+    status: EquipmentStatus.AVAILABLE,
+    studio: StudioRoom.STUDIO_A,
+    purchaseDate: "2021-11-20",
+    purchasePrice: 7500000,
+    currentValue: 5800000,
+    notes: "Console de mixage analogique compacte.",
+  },
+  {
+    name: "Universal Audio Apollo x8",
+    category: EquipmentCategory.INTERFACE,
+    serialNumber: "UAX8-112233",
+    status: EquipmentStatus.AVAILABLE,
+    studio: StudioRoom.STUDIO_A,
+    purchaseDate: "2022-06-05",
+    purchasePrice: 9000000,
+    currentValue: 7200000,
+    notes: "Interface audio 8 entrées, DSP intégré.",
+  },
+  {
+    name: "Yamaha HS8 (paire)",
+    category: EquipmentCategory.MONITOR,
+    serialNumber: "HS8-778812",
+    status: EquipmentStatus.IN_USE,
+    studio: StudioRoom.STUDIO_B,
+    purchaseDate: "2020-09-12",
+    purchasePrice: 2400000,
+    currentValue: 1600000,
+    notes: "Moniteurs de proximité, studio B.",
+  },
+  {
+    name: "Fender Stratocaster",
+    category: EquipmentCategory.INSTRUMENT,
+    serialNumber: "FEND-556677",
+    status: EquipmentStatus.AVAILABLE,
+    studio: StudioRoom.STUDIO_C,
+    purchaseDate: "2019-04-25",
+    purchasePrice: 4200000,
+    currentValue: 3000000,
+    notes: "Guitare électrique pour sessions.",
+  },
+  {
+    name: "Console live Allen & Heath SQ-6",
+    category: EquipmentCategory.CONSOLE,
+    serialNumber: "SQ6-443322",
+    status: EquipmentStatus.MAINTENANCE,
+    studio: StudioRoom.MOBILE,
+    purchaseDate: "2021-02-18",
+    purchasePrice: 11000000,
+    currentValue: 8000000,
+    notes: "En maintenance — révision des faders motorisés.",
+  },
+  {
+    name: "Snake numérique 32 canaux",
+    category: EquipmentCategory.CABLE,
+    serialNumber: "SNK32-990011",
+    status: EquipmentStatus.AVAILABLE,
+    studio: StudioRoom.MOBILE,
+    purchaseDate: "2020-07-30",
+    purchasePrice: 1500000,
+    currentValue: 900000,
+    notes: "Sonorisation live et prestations mobiles.",
+  },
+];
+
+interface DemoConsumable {
+  name: string;
+  unit: string;
+  quantity: number;
+  lowStockThreshold: number;
+  notes?: string;
+}
+
+const DEMO_CONSUMABLES: DemoConsumable[] = [
+  {
+    name: "Câble XLR 3m",
+    unit: "unité",
+    quantity: 45,
+    lowStockThreshold: 15,
+    notes: "Câbles micro standard.",
+  },
+  {
+    name: "Câble Jack 6.35mm 3m",
+    unit: "unité",
+    quantity: 30,
+    lowStockThreshold: 10,
+    notes: "Instruments et matériel.",
+  },
+  {
+    name: "Piles AA (lot)",
+    unit: "lot",
+    quantity: 8,
+    lowStockThreshold: 12,
+    notes: "Micros HF — stock bas, à recommander.",
+  },
+  {
+    name: "Piles 9V",
+    unit: "unité",
+    quantity: 6,
+    lowStockThreshold: 10,
+    notes: "Boîtiers DI actifs — stock bas.",
+  },
+  {
+    name: "Bonnette anti-pop",
+    unit: "unité",
+    quantity: 20,
+    lowStockThreshold: 5,
+    notes: "Accessoires micro voix.",
+  },
+  {
+    name: "Carte SD 128 Go",
+    unit: "unité",
+    quantity: 12,
+    lowStockThreshold: 4,
+    notes: "Enregistreurs portables.",
+  },
+  {
+    name: "Ruban gaffer noir",
+    unit: "rouleau",
+    quantity: 25,
+    lowStockThreshold: 8,
+    notes: "Fixation câbles sur scène.",
+  },
+];
+
 async function main() {
   const permissionByKey = new Map<string, { id: string }>();
   for (const module of ALL_MODULES) {
@@ -598,6 +772,311 @@ async function main() {
     });
   }
 
+  const soundEngineer = engineer;
+  for (const demoEquipment of DEMO_EQUIPMENT) {
+    const alreadyExists = await prisma.equipment.findFirst({
+      where: { serialNumber: demoEquipment.serialNumber },
+    });
+    if (alreadyExists) continue;
+
+    await prisma.equipment.create({
+      data: {
+        name: demoEquipment.name,
+        category: demoEquipment.category,
+        serialNumber: demoEquipment.serialNumber,
+        status: demoEquipment.status,
+        studio: demoEquipment.studio,
+        purchaseDate: new Date(demoEquipment.purchaseDate),
+        purchasePrice: demoEquipment.purchasePrice,
+        currentValue: demoEquipment.currentValue,
+        notes: demoEquipment.notes,
+        createdById: soundEngineer?.id ?? producer?.id,
+      },
+    });
+  }
+
+  for (const demoConsumable of DEMO_CONSUMABLES) {
+    const alreadyExists = await prisma.consumable.findFirst({
+      where: { name: demoConsumable.name },
+    });
+    if (alreadyExists) continue;
+
+    await prisma.consumable.create({
+      data: {
+        name: demoConsumable.name,
+        unit: demoConsumable.unit,
+        quantity: demoConsumable.quantity,
+        lowStockThreshold: demoConsumable.lowStockThreshold,
+        notes: demoConsumable.notes,
+        createdById: soundEngineer?.id ?? producer?.id,
+      },
+    });
+  }
+
+  interface DemoInvoiceItem {
+    description: string;
+    quantity: number;
+    unitPrice: number;
+  }
+  interface DemoInvoice {
+    reference: string;
+    clientKey: string;
+    projectKey?: string;
+    status: InvoiceStatus;
+    taxRate: number;
+    dueInDays: number;
+    items: DemoInvoiceItem[];
+    payment?: { amount: number; method: PaymentMethod };
+  }
+
+  const invoiceYear = new Date().getFullYear();
+  const DEMO_INVOICES: DemoInvoice[] = [
+    {
+      reference: `FAC-${invoiceYear}-001`,
+      clientKey: "tolotra",
+      projectKey: "tolotra_mixing",
+      status: InvoiceStatus.PAID,
+      taxRate: 20,
+      dueInDays: -10,
+      items: [{ description: "Mixage single 'Fitiavana'", quantity: 1, unitPrice: 800000 }],
+      payment: { amount: 960000, method: PaymentMethod.MOBILE_MONEY },
+    },
+    {
+      reference: `FAC-${invoiceYear}-002`,
+      clientKey: "saha_communication",
+      projectKey: "saha_voiceover",
+      status: InvoiceStatus.SENT,
+      taxRate: 20,
+      dueInDays: 15,
+      items: [
+        { description: "Voix off FR/MG spot radio 30s", quantity: 1, unitPrice: 450000 },
+        { description: "Session studio (heures)", quantity: 3, unitPrice: 60000 },
+      ],
+    },
+    {
+      reference: `FAC-${invoiceYear}-003`,
+      clientKey: "jovena",
+      projectKey: "jovena_rental",
+      status: InvoiceStatus.PARTIAL,
+      taxRate: 20,
+      dueInDays: 20,
+      items: [
+        { description: "Location console + enceintes", quantity: 1, unitPrice: 1200000 },
+        { description: "Micros HF (unités)", quantity: 6, unitPrice: 100000 },
+      ],
+      payment: { amount: 1000000, method: PaymentMethod.BANK_TRANSFER },
+    },
+    {
+      reference: `FAC-${invoiceYear}-004`,
+      clientKey: "mikea_records",
+      projectKey: "mikea_postproduction",
+      status: InvoiceStatus.OVERDUE,
+      taxRate: 20,
+      dueInDays: -5,
+      items: [{ description: "Post-production clip 'Tanindrazana'", quantity: 1, unitPrice: 2100000 }],
+    },
+    {
+      reference: `FAC-${invoiceYear}-005`,
+      clientKey: "zaza_orkestra",
+      status: InvoiceStatus.DRAFT,
+      taxRate: 20,
+      dueInDays: 30,
+      items: [{ description: "Mastering album studio", quantity: 1, unitPrice: 1400000 }],
+    },
+  ];
+
+  for (const demoInvoice of DEMO_INVOICES) {
+    const alreadyExists = await prisma.invoice.findUnique({ where: { reference: demoInvoice.reference } });
+    if (alreadyExists) continue;
+
+    const client = clientByKey.get(demoInvoice.clientKey);
+    if (!client) continue;
+    const project = demoInvoice.projectKey ? projectByKey.get(demoInvoice.projectKey) : undefined;
+
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + demoInvoice.dueInDays);
+
+    const invoice = await prisma.invoice.create({
+      data: {
+        reference: demoInvoice.reference,
+        clientId: client.id,
+        projectId: project?.id,
+        status: demoInvoice.status,
+        taxRate: demoInvoice.taxRate,
+        currency: Currency.MGA,
+        dueDate,
+        createdById: producer?.id,
+        items: { create: demoInvoice.items },
+      },
+    });
+
+    if (demoInvoice.payment) {
+      await prisma.payment.create({
+        data: {
+          invoiceId: invoice.id,
+          amount: demoInvoice.payment.amount,
+          method: demoInvoice.payment.method,
+          createdById: producer?.id,
+        },
+      });
+    }
+  }
+
+  // Backfill idempotent des points de fidélité : 1 pt / 10 000 Ar effectivement payés.
+  const allInvoices = await prisma.invoice.findMany({
+    select: { clientId: true, payments: { select: { amount: true } } },
+  });
+  const paidByClient = new Map<string, number>();
+  for (const inv of allInvoices) {
+    const paid = inv.payments.reduce((sum, p) => sum + Number(p.amount), 0);
+    paidByClient.set(inv.clientId, (paidByClient.get(inv.clientId) ?? 0) + paid);
+  }
+  for (const [clientId, paid] of paidByClient) {
+    await prisma.client.update({
+      where: { id: clientId },
+      data: { loyaltyPoints: Math.floor(paid / 10000) },
+    });
+  }
+
+  interface DemoExpense {
+    label: string;
+    category: ExpenseCategory;
+    amount: number;
+    monthsAgo: number;
+  }
+  const DEMO_EXPENSES: DemoExpense[] = [
+    { label: "Salaires équipe (mensuel)", category: ExpenseCategory.SALARY, amount: 4500000, monthsAgo: 0 },
+    { label: "Loyer studio", category: ExpenseCategory.RENT, amount: 1200000, monthsAgo: 0 },
+    { label: "Électricité JIRAMA", category: ExpenseCategory.ELECTRICITY, amount: 350000, monthsAgo: 0 },
+    { label: "Abonnement Internet fibre", category: ExpenseCategory.INTERNET, amount: 180000, monthsAgo: 0 },
+    { label: "Maintenance console SQ-6", category: ExpenseCategory.MAINTENANCE, amount: 600000, monthsAgo: 1 },
+    { label: "Salaires équipe (mensuel)", category: ExpenseCategory.SALARY, amount: 4500000, monthsAgo: 1 },
+    { label: "Achat câbles & consommables", category: ExpenseCategory.SUPPLIES, amount: 250000, monthsAgo: 1 },
+    { label: "Taxe professionnelle", category: ExpenseCategory.TAX, amount: 800000, monthsAgo: 2 },
+  ];
+
+  for (const demoExpense of DEMO_EXPENSES) {
+    const incurredAt = new Date();
+    incurredAt.setMonth(incurredAt.getMonth() - demoExpense.monthsAgo);
+    const exists = await prisma.expense.findFirst({
+      where: {
+        label: demoExpense.label,
+        category: demoExpense.category,
+        incurredAt: {
+          gte: new Date(incurredAt.getFullYear(), incurredAt.getMonth(), 1),
+          lt: new Date(incurredAt.getFullYear(), incurredAt.getMonth() + 1, 1),
+        },
+      },
+    });
+    if (exists) continue;
+    await prisma.expense.create({
+      data: {
+        label: demoExpense.label,
+        category: demoExpense.category,
+        amount: demoExpense.amount,
+        incurredAt,
+        createdById: producer?.id,
+      },
+    });
+  }
+
+  interface DemoStudio {
+    name: string;
+    type: StudioType;
+    capacity: number;
+    hourlyPrice: number;
+    status: StudioStatus;
+    description: string;
+    equipmentSummary: string;
+  }
+  const DEMO_STUDIOS: DemoStudio[] = [
+    { name: "Studio A", type: StudioType.RECORDING, capacity: 6, hourlyPrice: 80000, status: StudioStatus.AVAILABLE, description: "Grande cabine d'enregistrement, régie SSL.", equipmentSummary: "Neumann U87, SSL SiX, UA Apollo x8" },
+    { name: "Studio B", type: StudioType.RECORDING, capacity: 3, hourlyPrice: 50000, status: StudioStatus.AVAILABLE, description: "Cabine voix / podcast.", equipmentSummary: "Shure SM7B, Yamaha HS8" },
+    { name: "Studio C", type: StudioType.REHEARSAL, capacity: 8, hourlyPrice: 40000, status: StudioStatus.AVAILABLE, description: "Salle de répétition / prises live.", equipmentSummary: "Backline, Fender Stratocaster" },
+    { name: "Studio Podcast", type: StudioType.PODCAST, capacity: 4, hourlyPrice: 45000, status: StudioStatus.AVAILABLE, description: "Plateau podcast 4 micros.", equipmentSummary: "4x micros dynamiques, table de mixage" },
+    { name: "Régie Mobile", type: StudioType.LIVE, capacity: 20, hourlyPrice: 150000, status: StudioStatus.MAINTENANCE, description: "Sonorisation live et prestations extérieures.", equipmentSummary: "Console Allen & Heath SQ-6, snake 32 canaux" },
+  ];
+
+  for (const demoStudio of DEMO_STUDIOS) {
+    const exists = await prisma.studio.findFirst({ where: { name: demoStudio.name } });
+    if (exists) continue;
+    await prisma.studio.create({ data: { ...demoStudio, createdById: producer?.id } });
+  }
+
+  // Planifie une maintenance imminente + historique sur la console live (démo alerte).
+  const sqConsole = await prisma.equipment.findFirst({ where: { serialNumber: "SQ6-443322" } });
+  if (sqConsole) {
+    const soon = new Date();
+    soon.setDate(soon.getDate() + 10);
+    await prisma.equipment.update({
+      where: { id: sqConsole.id },
+      data: { nextMaintenanceAt: soon, brand: "Allen & Heath", model: "SQ-6", location: "Régie Mobile" },
+    });
+    const hasRecord = await prisma.maintenanceRecord.findFirst({ where: { equipmentId: sqConsole.id } });
+    if (!hasRecord) {
+      await prisma.maintenanceRecord.create({
+        data: {
+          equipmentId: sqConsole.id,
+          description: "Révision des faders motorisés",
+          cost: 350000,
+          technician: "Rado Technicien",
+          partsReplaced: "2 faders",
+          createdById: producer?.id,
+        },
+      });
+    }
+  }
+
+  interface DemoEmployee {
+    firstName: string;
+    lastName: string;
+    position: string;
+    type: EmployeeType;
+    dailyRate: number;
+    leave?: { type: LeaveType; startInDays: number; days: number; status: LeaveStatus; reason: string };
+  }
+  const DEMO_EMPLOYEES: DemoEmployee[] = [
+    { firstName: "Tojo", lastName: "Andrianina", position: "Ingénieur du son", type: EmployeeType.EMPLOYEE, dailyRate: 120000, leave: { type: LeaveType.LEAVE, startInDays: 5, days: 3, status: LeaveStatus.APPROVED, reason: "Congés annuels" } },
+    { firstName: "Mialy", lastName: "Ravelojaona", position: "Beatmaker freelance", type: EmployeeType.FREELANCE, dailyRate: 90000, leave: { type: LeaveType.OVERTIME, startInDays: -2, days: 1, status: LeaveStatus.PENDING, reason: "Session nocturne" } },
+    { firstName: "Hery", lastName: "Rakoto", position: "Producteur", type: EmployeeType.EMPLOYEE, dailyRate: 150000 },
+    { firstName: "Fara", lastName: "Razafindrakoto", position: "Chargée commerciale", type: EmployeeType.EMPLOYEE, dailyRate: 80000, leave: { type: LeaveType.SICK, startInDays: -1, days: 2, status: LeaveStatus.APPROVED, reason: "Maladie" } },
+    { firstName: "Rado", lastName: "Technicien", position: "Technicien maintenance", type: EmployeeType.FREELANCE, dailyRate: 70000 },
+  ];
+
+  for (const demoEmployee of DEMO_EMPLOYEES) {
+    const exists = await prisma.employee.findFirst({
+      where: { firstName: demoEmployee.firstName, lastName: demoEmployee.lastName },
+    });
+    if (exists) continue;
+    const employee = await prisma.employee.create({
+      data: {
+        firstName: demoEmployee.firstName,
+        lastName: demoEmployee.lastName,
+        position: demoEmployee.position,
+        type: demoEmployee.type,
+        dailyRate: demoEmployee.dailyRate,
+        status: EmployeeStatus.ACTIVE,
+        createdById: producer?.id,
+      },
+    });
+    if (demoEmployee.leave) {
+      const start = new Date();
+      start.setDate(start.getDate() + demoEmployee.leave.startInDays);
+      const end = new Date(start);
+      end.setDate(end.getDate() + demoEmployee.leave.days);
+      await prisma.leaveRequest.create({
+        data: {
+          employeeId: employee.id,
+          type: demoEmployee.leave.type,
+          startDate: start,
+          endDate: end,
+          status: demoEmployee.leave.status,
+          reason: demoEmployee.leave.reason,
+        },
+      });
+    }
+  }
+
   console.log("Seed terminé. Comptes de démonstration (mot de passe commun : ChangeMe123!) :");
   for (const demoUser of DEMO_USERS) {
     console.log(`  - ${demoUser.email} (${demoUser.roleName})`);
@@ -605,6 +1084,12 @@ async function main() {
   console.log(`Clients de démonstration : ${DEMO_CLIENTS.length}`);
   console.log(`Projets de démonstration : ${DEMO_PROJECTS.length}`);
   console.log(`Réservations de démonstration : ${DEMO_BOOKINGS.length}`);
+  console.log(`Matériel de démonstration : ${DEMO_EQUIPMENT.length}`);
+  console.log(`Consommables de démonstration : ${DEMO_CONSUMABLES.length}`);
+  console.log(`Factures de démonstration : ${DEMO_INVOICES.length}`);
+  console.log(`Dépenses de démonstration : ${DEMO_EXPENSES.length}`);
+  console.log(`Studios de démonstration : ${DEMO_STUDIOS.length}`);
+  console.log(`Employés de démonstration : ${DEMO_EMPLOYEES.length}`);
 }
 
 main()

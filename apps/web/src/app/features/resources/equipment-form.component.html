@@ -1,0 +1,193 @@
+<div class="flex items-center gap-2 mb-6">
+  <a routerLink="/resources" class="text-gs-light/60 hover:text-gs-blue">
+    <gs-icon name="back" [size]="20" />
+  </a>
+  <h2 class="font-display text-2xl font-semibold">
+    {{ (equipmentId() ? 'resources.equipment.form.edit_title' : 'resources.equipment.form.create_title') | translate }}
+  </h2>
+</div>
+
+<form
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+  class="max-w-2xl bg-gs-dark-gray border border-gs-border rounded-xl p-6 space-y-4"
+>
+  <div>
+    <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.name' | translate }}</label>
+    <input
+      type="text"
+      formControlName="name"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    />
+    @if (form.controls.name.invalid && form.controls.name.touched) {
+      <p class="text-gs-orange text-xs mt-1">{{ 'resources.equipment.form.name_error' | translate }}</p>
+    }
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.category' | translate }}</label>
+      <select
+        formControlName="category"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      >
+        @for (category of categories; track category) {
+          <option [value]="category">{{ ('resources.equipment.category.' + category) | translate }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.status' | translate }}</label>
+      <select
+        formControlName="status"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      >
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ ('resources.equipment.status.' + status) | translate }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.studio' | translate }}</label>
+      <select
+        formControlName="studio"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      >
+        <option value="">{{ 'resources.equipment.form.no_studio' | translate }}</option>
+        @for (studio of studios; track studio) {
+          <option [value]="studio">{{ ('planning.studio.' + studio) | translate }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.serial_number' | translate }}</label>
+      <input type="text" formControlName="serialNumber"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.brand' | translate }}</label>
+      <input type="text" formControlName="brand"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.model' | translate }}</label>
+      <input type="text" formControlName="model"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.purchase_date' | translate }}</label>
+      <input type="date" formControlName="purchaseDate"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.purchase_price' | translate }}</label>
+      <input type="number" min="0" formControlName="purchasePrice"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.current_value' | translate }}</label>
+      <input type="number" min="0" formControlName="currentValue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.location' | translate }}</label>
+      <input type="text" formControlName="location"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.warranty_until' | translate }}</label>
+      <input type="date" formControlName="warrantyUntil"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+    </div>
+    <div>
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.next_maintenance' | translate }}</label>
+      <input type="date" formControlName="nextMaintenanceAt"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-sm text-gs-light/70 mb-1">{{ 'resources.equipment.form.notes' | translate }}</label>
+    <textarea
+      formControlName="notes"
+      rows="3"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    ></textarea>
+  </div>
+
+  @if (serverError(); as errorKey) {
+    <p class="text-gs-orange text-sm">{{ errorKey | translate }}</p>
+  }
+
+  <div class="flex items-center gap-3 pt-2">
+    <button
+      type="submit"
+      [disabled]="saving()"
+      class="inline-flex items-center gap-2 rounded-md bg-gs-blue text-gs-black font-semibold px-4 py-2 text-sm hover:opacity-90 disabled:opacity-50 transition-opacity"
+    >
+      <gs-icon name="check" [size]="16" />
+      {{ 'resources.equipment.form.save' | translate }}
+    </button>
+    <a routerLink="/resources" class="text-sm text-gs-light/60 hover:text-gs-light">
+      {{ 'resources.equipment.form.cancel' | translate }}
+    </a>
+  </div>
+</form>
+
+@if (equipmentId()) {
+  <section class="max-w-2xl bg-gs-dark-gray border border-gs-border rounded-xl p-6 mt-6">
+    <h3 class="font-display text-lg font-semibold mb-4">{{ 'resources.maintenance.title' | translate }}</h3>
+
+    @if (maintenance().length === 0) {
+      <p class="text-sm text-gs-light/50 mb-4">{{ 'resources.maintenance.empty' | translate }}</p>
+    } @else {
+      <ul class="divide-y divide-gs-border mb-4">
+        @for (record of maintenance(); track record.id) {
+          <li class="py-3">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-medium">{{ record.description }}</p>
+              <span class="text-xs text-gs-light/50">{{ record.performedAt | date: 'shortDate' }}</span>
+            </div>
+            <p class="text-xs text-gs-light/50">
+              @if (record.technician) { {{ record.technician }} · }
+              @if (record.cost) { {{ record.cost | number }} MGA }
+              @if (record.partsReplaced) { · {{ record.partsReplaced }} }
+            </p>
+          </li>
+        }
+      </ul>
+    }
+
+    <div class="border-t border-gs-border pt-4 space-y-2">
+      <h4 class="text-sm font-medium">{{ 'resources.maintenance.add' | translate }}</h4>
+      <input type="text" [ngModel]="mDescription()" (ngModelChange)="mDescription.set($event)"
+        [placeholder]="'resources.maintenance.description' | translate"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input type="text" [ngModel]="mTechnician()" (ngModelChange)="mTechnician.set($event)"
+          [placeholder]="'resources.maintenance.technician' | translate"
+          class="flex-1 rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+        <input type="number" min="0" [ngModel]="mCost()" (ngModelChange)="mCost.set($event)"
+          [placeholder]="'resources.maintenance.cost' | translate"
+          class="w-full sm:w-36 rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+      </div>
+      <input type="text" [ngModel]="mParts()" (ngModelChange)="mParts.set($event)"
+        [placeholder]="'resources.maintenance.parts' | translate"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue" />
+      <button type="button" (click)="addMaintenance()" [disabled]="savingMaintenance()"
+        class="inline-flex items-center gap-1 rounded-md bg-gs-blue px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90 disabled:opacity-50">
+        <gs-icon name="add" [size]="16" />
+        {{ 'resources.maintenance.record' | translate }}
+      </button>
+    </div>
+  </section>
+}

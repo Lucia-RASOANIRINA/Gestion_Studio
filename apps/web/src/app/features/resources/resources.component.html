@@ -1,0 +1,227 @@
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+  <div class="flex items-center gap-2">
+    <gs-icon name="resources" [size]="22" class="text-gs-blue" />
+    <h2 class="font-display text-2xl font-semibold">{{ 'nav.resources' | translate }}</h2>
+  </div>
+  @if (tab() === 'equipment') {
+    <a
+      routerLink="/resources/equipment/new"
+      class="inline-flex items-center gap-2 rounded-md bg-gs-blue text-gs-black font-semibold px-4 py-2 text-sm hover:opacity-90 transition-opacity w-fit"
+    >
+      <gs-icon name="add" [size]="16" />
+      {{ 'resources.equipment.add' | translate }}
+    </a>
+  } @else {
+    <a
+      routerLink="/resources/consumables/new"
+      class="inline-flex items-center gap-2 rounded-md bg-gs-blue text-gs-black font-semibold px-4 py-2 text-sm hover:opacity-90 transition-opacity w-fit"
+    >
+      <gs-icon name="add" [size]="16" />
+      {{ 'resources.consumables.add' | translate }}
+    </a>
+  }
+</div>
+
+@if (error(); as errorKey) {
+  <div class="flex items-center gap-2 rounded-md border border-gs-orange/40 bg-gs-orange/10 text-gs-orange text-sm px-4 py-3 mb-4">
+    <gs-icon name="alert" [size]="16" />
+    {{ errorKey | translate }}
+  </div>
+}
+
+<div class="flex rounded-md border border-gs-border overflow-hidden text-sm w-fit mb-4">
+  <button
+    type="button"
+    class="px-4 py-2"
+    [class.bg-gs-blue]="tab() === 'equipment'"
+    [class.text-gs-black]="tab() === 'equipment'"
+    [class.bg-gs-dark-gray]="tab() !== 'equipment'"
+    (click)="setTab('equipment')"
+  >
+    {{ 'resources.tabs.equipment' | translate }}
+  </button>
+  <button
+    type="button"
+    class="px-4 py-2"
+    [class.bg-gs-blue]="tab() === 'consumables'"
+    [class.text-gs-black]="tab() === 'consumables'"
+    [class.bg-gs-dark-gray]="tab() !== 'consumables'"
+    (click)="setTab('consumables')"
+  >
+    {{ 'resources.tabs.consumables' | translate }}
+  </button>
+</div>
+
+@if (tab() === 'equipment') {
+  <div class="flex flex-col sm:flex-row gap-3 mb-4">
+    <div class="relative flex-1">
+      <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gs-light/40">
+        <gs-icon name="search" [size]="16" />
+      </span>
+      <input
+        type="text"
+        [(ngModel)]="equipmentSearch"
+        (ngModelChange)="loadEquipment()"
+        [placeholder]="'resources.equipment.search_placeholder' | translate"
+        class="w-full rounded-md bg-gs-dark-gray border border-gs-border pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      />
+    </div>
+    <select
+      [(ngModel)]="categoryFilter"
+      (ngModelChange)="loadEquipment()"
+      class="rounded-md bg-gs-dark-gray border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    >
+      <option value="">{{ 'resources.equipment.all_categories' | translate }}</option>
+      @for (category of categories; track category) {
+        <option [value]="category">{{ ('resources.equipment.category.' + category) | translate }}</option>
+      }
+    </select>
+    <select
+      [(ngModel)]="statusFilter"
+      (ngModelChange)="loadEquipment()"
+      class="rounded-md bg-gs-dark-gray border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    >
+      <option value="">{{ 'resources.equipment.all_statuses' | translate }}</option>
+      @for (status of statuses; track status) {
+        <option [value]="status">{{ ('resources.equipment.status.' + status) | translate }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="bg-gs-dark-gray border border-gs-border rounded-xl overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-gs-light/50 border-b border-gs-border">
+          <th class="px-4 py-3 font-medium">{{ 'resources.equipment.table.name' | translate }}</th>
+          <th class="px-4 py-3 font-medium">{{ 'resources.equipment.table.category' | translate }}</th>
+          <th class="px-4 py-3 font-medium hidden md:table-cell">{{ 'resources.equipment.table.studio' | translate }}</th>
+          <th class="px-4 py-3 font-medium">{{ 'resources.equipment.table.status' | translate }}</th>
+          <th class="px-4 py-3 font-medium hidden lg:table-cell">{{ 'resources.equipment.table.value' | translate }}</th>
+          <th class="px-4 py-3 font-medium text-right">{{ 'resources.equipment.table.actions' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of equipment(); track item.id) {
+          <tr class="border-b border-gs-border last:border-0 hover:bg-gs-hover">
+            <td class="px-4 py-3">
+              <a [routerLink]="['/resources/equipment', item.id, 'edit']" class="font-medium hover:text-gs-blue">{{ item.name }}</a>
+              @if (item.serialNumber) {
+                <div class="text-xs text-gs-light/50">{{ item.serialNumber }}</div>
+              }
+            </td>
+            <td class="px-4 py-3 text-gs-light/70">{{ ('resources.equipment.category.' + item.category) | translate }}</td>
+            <td class="px-4 py-3 text-gs-light/70 hidden md:table-cell">
+              {{ item.studio ? ('planning.studio.' + item.studio | translate) : '—' }}
+            </td>
+            <td class="px-4 py-3">
+              <span class="text-xs px-2 py-1 rounded-full" [class]="statusBadgeClass(item.status)">
+                {{ ('resources.equipment.status.' + item.status) | translate }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-gs-light/70 hidden lg:table-cell">
+              {{ item.currentValue ? (item.currentValue + ' MGA') : '—' }}
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center justify-end gap-2">
+                <a [routerLink]="['/resources/equipment', item.id, 'edit']" class="text-gs-light/60 hover:text-gs-blue">
+                  <gs-icon name="edit" [size]="16" />
+                </a>
+                <button type="button" class="text-gs-light/60 hover:text-gs-orange" (click)="removeEquipment(item)">
+                  <gs-icon name="delete" [size]="16" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="px-4 py-8 text-center text-gs-light/50">{{ 'resources.equipment.empty' | translate }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="text-xs text-gs-light/40 mt-3">{{ equipmentTotal() }} {{ 'resources.equipment.total_suffix' | translate }}</p>
+}
+
+@if (tab() === 'consumables') {
+  <div class="flex flex-col sm:flex-row gap-3 mb-4">
+    <div class="relative flex-1">
+      <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gs-light/40">
+        <gs-icon name="search" [size]="16" />
+      </span>
+      <input
+        type="text"
+        [(ngModel)]="consumableSearch"
+        (ngModelChange)="loadConsumables()"
+        [placeholder]="'resources.consumables.search_placeholder' | translate"
+        class="w-full rounded-md bg-gs-dark-gray border border-gs-border pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      />
+    </div>
+    <label class="flex items-center gap-2 text-sm text-gs-light/70 px-3">
+      <input type="checkbox" [(ngModel)]="lowStockOnly" (ngModelChange)="loadConsumables()" />
+      {{ 'resources.consumables.low_stock_only' | translate }}
+    </label>
+  </div>
+
+  <div class="bg-gs-dark-gray border border-gs-border rounded-xl overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-gs-light/50 border-b border-gs-border">
+          <th class="px-4 py-3 font-medium">{{ 'resources.consumables.table.name' | translate }}</th>
+          <th class="px-4 py-3 font-medium">{{ 'resources.consumables.table.quantity' | translate }}</th>
+          <th class="px-4 py-3 font-medium hidden md:table-cell">{{ 'resources.consumables.table.threshold' | translate }}</th>
+          <th class="px-4 py-3 font-medium">{{ 'resources.consumables.table.status' | translate }}</th>
+          <th class="px-4 py-3 font-medium text-right">{{ 'resources.consumables.table.actions' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of consumables(); track item.id) {
+          <tr class="border-b border-gs-border last:border-0 hover:bg-gs-hover">
+            <td class="px-4 py-3">
+              <a [routerLink]="['/resources/consumables', item.id, 'edit']" class="font-medium hover:text-gs-blue">{{ item.name }}</a>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-2">
+                <button type="button" class="text-gs-light/60 hover:text-gs-orange" (click)="adjustStock(item, -1)">
+                  <gs-icon name="minus" [size]="14" />
+                </button>
+                <span>{{ item.quantity }} {{ item.unit }}</span>
+                <button type="button" class="text-gs-light/60 hover:text-gs-green" (click)="adjustStock(item, 1)">
+                  <gs-icon name="add" [size]="14" />
+                </button>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-gs-light/70 hidden md:table-cell">{{ item.lowStockThreshold }}</td>
+            <td class="px-4 py-3">
+              @if (item.isLowStock) {
+                <span class="text-xs px-2 py-1 rounded-full bg-gs-orange/20 text-gs-orange flex items-center gap-1 w-fit">
+                  <gs-icon name="alert" [size]="12" />
+                  {{ 'resources.consumables.low_stock' | translate }}
+                </span>
+              } @else {
+                <span class="text-xs px-2 py-1 rounded-full bg-gs-green/20 text-gs-green">
+                  {{ 'resources.consumables.in_stock' | translate }}
+                </span>
+              }
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center justify-end gap-2">
+                <a [routerLink]="['/resources/consumables', item.id, 'edit']" class="text-gs-light/60 hover:text-gs-blue">
+                  <gs-icon name="edit" [size]="16" />
+                </a>
+                <button type="button" class="text-gs-light/60 hover:text-gs-orange" (click)="removeConsumable(item)">
+                  <gs-icon name="delete" [size]="16" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="px-4 py-8 text-center text-gs-light/50">{{ 'resources.consumables.empty' | translate }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="text-xs text-gs-light/40 mt-3">{{ consumablesTotal() }} {{ 'resources.consumables.total_suffix' | translate }}</p>
+}

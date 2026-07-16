@@ -40,6 +40,7 @@ model User {
   lastName     String
   phone        String?
   locale       String    @default("fr")
+  theme        String    @default("dark")
   isActive     Boolean   @default(true)
   failedLoginAttempts Int @default(0)
   lockedUntil  DateTime?
@@ -53,6 +54,14 @@ model User {
   createdProjects Project[]
   createdBookings Booking[] @relation("BookingCreatedBy")
   engineerBookings Booking[] @relation("BookingEngineer")
+  createdEquipment Equipment[]
+  createdConsumables Consumable[]
+  createdInvoices Invoice[]
+  createdPayments Payment[]
+  createdExpenses Expense[]
+  createdStudios Studio[]
+  createdMaintenance MaintenanceRecord[]
+  createdEmployees Employee[]
 
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -160,10 +169,17 @@ model Client {
   notes            String?
   reliabilityScore Int           @default(100)
 
+  // Fidélité : points cumulés (1 pt / 10 000 Ar payés). Le niveau (tier) est dérivé
+  // des points côté service, jamais stocké, pour rester cohérent après ajustement.
+  loyaltyPoints    Int           @default(0)
+  isBlacklisted    Boolean       @default(false)
+  blacklistReason  String?
+
   createdById      String?
   createdBy        User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
   projects         Project[]
+  invoices         Invoice[]
 
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
@@ -210,6 +226,11 @@ model Project {
   startDate      DateTime?
   dueDate        DateTime?
 
+  // Avancement (0-100 %) et check-list avant livraison stockée en JSON
+  // (tableau d'objets { label, done }).
+  progress       Int           @default(0)
+  checklist      Json?
+
   clientId       String
   client         Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
 
@@ -220,6 +241,7 @@ model Project {
   updatedAt      DateTime      @updatedAt
 
   bookings       Booking[]
+  invoices       Invoice[]
 
   @@map("projects")
 }
@@ -261,4 +283,315 @@ model Booking {
   updatedAt DateTime    @updatedAt
 
   @@map("bookings")
+}
+
+enum EquipmentCategory {
+  MICROPHONE
+  CONSOLE
+  INTERFACE
+  MONITOR
+  INSTRUMENT
+  CABLE
+  OTHER
+}
+
+enum EquipmentStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  RETIRED
+}
+
+/// Amortissement/valeur résiduelle suivis manuellement (purchasePrice/currentValue)
+/// plutôt que calculés automatiquement, pour laisser la comptabilité ajuster
+/// selon sa propre méthode d'amortissement.
+model Equipment {
+  id            String            @id @default(uuid())
+  name          String
+  category      EquipmentCategory @default(OTHER)
+  serialNumber  String?
+  brand         String?
+  model         String?
+  location      String?
+  status        EquipmentStatus   @default(AVAILABLE)
+  studio        StudioRoom?
+  purchaseDate  DateTime?
+  warrantyUntil DateTime?
+  purchasePrice Decimal?          @db.Decimal(14, 2)
+  currentValue  Decimal?          @db.Decimal(14, 2)
+  photoUrl      String?
+  // Date de la prochaine maintenance planifiée : sert à générer une alerte
+  // (« maintenance prévue dans X jours ») côté notifications.
+  nextMaintenanceAt DateTime?
+  notes         String?
+
+  createdById   String?
+  createdBy     User?             @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  maintenanceRecords MaintenanceRecord[]
+
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@map("equipment")
+}
+
+/// Historique de maintenance/réparation d'un équipement (coût, technicien, pièces).
+model MaintenanceRecord {
+  id            String    @id @default(uuid())
+  equipmentId   String
+  equipment     Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  performedAt   DateTime  @default(now())
+  description   String
+  cost          Decimal?  @db.Decimal(14, 2)
+  technician    String?
+  partsReplaced String?
+
+  createdById   String?
+  createdBy     User?     @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt     DateTime  @default(now())
+
+  @@map("maintenance_records")
+}
+
+enum StudioType {
+  RECORDING
+  PODCAST
+  LIVE
+  VIDEO
+  REHEARSAL
+  OTHER
+}
+
+enum StudioStatus {
+  AVAILABLE
+  MAINTENANCE
+  CLOSED
+}
+
+// --- Ressources Humaines ---
+
+enum EmployeeType {
+  EMPLOYEE
+  FREELANCE
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Employee {
+  id         String         @id @default(uuid())
+  firstName  String
+  lastName   String
+  position   String
+  type       EmployeeType   @default(EMPLOYEE)
+  email      String?
+  phone      String?
+  hireDate   DateTime?
+  dailyRate  Decimal?       @db.Decimal(14, 2)
+  status     EmployeeStatus @default(ACTIVE)
+  notes      String?
+
+  leaveRequests LeaveRequest[]
+
+  createdById String?
+  createdBy   User?          @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@map("employees")
+}
+
+enum LeaveType {
+  LEAVE
+  SICK
+  UNPAID
+  OVERTIME
+  ABSENCE
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Congés, absences et heures supplémentaires d'un employé.
+model LeaveRequest {
+  id         String      @id @default(uuid())
+  employeeId String
+  employee   Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  type       LeaveType   @default(LEAVE)
+  startDate  DateTime
+  endDate    DateTime
+  status     LeaveStatus @default(PENDING)
+  reason     String?
+
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@map("leave_requests")
+}
+
+/// Catalogue des studios/salles (capacité, tarif, équipements, disponibilité).
+model Studio {
+  id               String       @id @default(uuid())
+  name             String
+  type             StudioType   @default(RECORDING)
+  capacity         Int          @default(1)
+  hourlyPrice      Decimal?     @db.Decimal(14, 2)
+  status           StudioStatus @default(AVAILABLE)
+  description      String?
+  equipmentSummary String?
+  photoUrl         String?
+  notes            String?
+
+  createdById      String?
+  createdBy        User?        @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@map("studios")
+}
+
+/// Stocks consommables (câbles, piles, etc.) — l'alerte de stock bas est
+/// dérivée de `quantity <= lowStockThreshold`, pas stockée en base.
+model Consumable {
+  id                String   @id @default(uuid())
+  name              String
+  unit              String   @default("unité")
+  quantity          Int      @default(0)
+  lowStockThreshold Int      @default(10)
+  notes             String?
+
+  createdById       String?
+  createdBy         User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("consumables")
+}
+
+// --- Facturation & Finances (phase 6) ---
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PARTIAL
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  MOBILE_MONEY
+  BANK_TRANSFER
+  CARD
+  OTHER
+}
+
+/// Les montants (sous-total, TVA, total, solde) sont calculés à la volée à partir
+/// des lignes et des paiements, jamais stockés, pour rester cohérents en cas de
+/// modification d'une ligne. Seul `taxRate` (%) est stocké par facture.
+model Invoice {
+  id          String        @id @default(uuid())
+  reference   String        @unique
+  status      InvoiceStatus @default(DRAFT)
+  issueDate   DateTime      @default(now())
+  dueDate     DateTime?
+  currency    Currency      @default(MGA)
+  taxRate     Decimal       @default(20) @db.Decimal(5, 2)
+  notes       String?
+
+  // Signature électronique : image (data URL PNG) capturée à la souris/tablette.
+  // Une fois signée, la facture est verrouillée (ni édition ni changement de statut).
+  signatureDataUrl String?  @db.Text
+  signedBy         String?
+  signedAt         DateTime?
+
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  projectId   String?
+  project     Project?      @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  items       InvoiceItem[]
+  payments    Payment[]
+
+  createdById String?
+  createdBy   User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String  @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String
+  quantity    Decimal @default(1) @db.Decimal(12, 2)
+  unitPrice   Decimal @default(0) @db.Decimal(14, 2)
+
+  createdAt   DateTime @default(now())
+
+  @@map("invoice_items")
+}
+
+model Payment {
+  id          String        @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amount      Decimal       @db.Decimal(14, 2)
+  method      PaymentMethod @default(MOBILE_MONEY)
+  reference   String?
+  paidAt      DateTime      @default(now())
+
+  createdById String?
+  createdBy   User?         @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime      @default(now())
+
+  @@map("payments")
+}
+
+enum ExpenseCategory {
+  SALARY
+  RENT
+  INTERNET
+  ELECTRICITY
+  MAINTENANCE
+  TAX
+  EQUIPMENT
+  SUPPLIES
+  OTHER
+}
+
+/// Dépenses de la structure (charges, salaires, taxes…) — la trésorerie (entrées
+/// vs sorties) est calculée à la volée en confrontant paiements et dépenses.
+model Expense {
+  id          String          @id @default(uuid())
+  label       String
+  category    ExpenseCategory @default(OTHER)
+  amount      Decimal         @db.Decimal(14, 2)
+  currency    Currency        @default(MGA)
+  incurredAt  DateTime        @default(now())
+  notes       String?
+
+  createdById String?
+  createdBy   User?           @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@map("expenses")
 }
