@@ -1,0 +1,62 @@
+<div>
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div class="flex items-center gap-2">
+      <gs-icon name="studios" [size]="22" class="text-gs-blue" />
+      <h2 class="font-display text-2xl font-semibold">{{ 'nav.studios' | translate }}</h2>
+    </div>
+    <a routerLink="/studios/new" class="inline-flex items-center gap-2 rounded-md bg-gs-blue px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90">
+      <gs-icon name="add" [size]="16" />
+      {{ 'studios.add' | translate }}
+    </a>
+  </div>
+
+  @if (loading()) {
+    <p class="text-gs-light/60">{{ 'common.loading' | translate }}</p>
+  } @else if (items().length === 0) {
+    <p class="text-gs-light/60">{{ 'studios.empty' | translate }}</p>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (studio of items(); track studio.id) {
+        <div class="rounded-lg border border-gs-border bg-gs-dark-gray p-5 flex flex-col">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h3 class="font-display text-lg font-semibold">{{ studio.name }}</h3>
+              <p class="text-xs text-gs-light/50">{{ ('studios.type.' + studio.type) | translate }}</p>
+            </div>
+            <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" [class]="statusBadgeClass(studio.status)">
+              {{ ('studios.status.' + studio.status) | translate }}
+            </span>
+          </div>
+
+          @if (studio.description) {
+            <p class="mt-2 text-sm text-gs-light/70">{{ studio.description }}</p>
+          }
+
+          <dl class="mt-3 grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <dt class="text-gs-light/50 text-xs">{{ 'studios.capacity' | translate }}</dt>
+              <dd>{{ studio.capacity }}</dd>
+            </div>
+            <div>
+              <dt class="text-gs-light/50 text-xs">{{ 'studios.hourly_price' | translate }}</dt>
+              <dd>{{ studio.hourlyPrice ? (studio.hourlyPrice | number) + ' MGA' : '—' }}</dd>
+            </div>
+          </dl>
+
+          @if (studio.equipmentSummary) {
+            <p class="mt-2 text-xs text-gs-light/50">{{ 'studios.equipment' | translate }}: {{ studio.equipmentSummary }}</p>
+          }
+
+          <div class="mt-4 flex items-center justify-end gap-2 pt-2 border-t border-gs-border">
+            <a [routerLink]="['/studios', studio.id, 'edit']" class="text-gs-light/60 hover:text-gs-blue">
+              <gs-icon name="edit" [size]="16" />
+            </a>
+            <button type="button" class="text-gs-light/60 hover:text-gs-orange" (click)="remove(studio)">
+              <gs-icon name="delete" [size]="16" />
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

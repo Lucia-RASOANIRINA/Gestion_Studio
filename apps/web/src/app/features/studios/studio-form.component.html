@@ -1,0 +1,71 @@
+<div class="max-w-2xl">
+  <a routerLink="/studios" class="inline-flex items-center gap-1 text-sm text-gs-light/60 hover:text-gs-blue mb-4">
+    <gs-icon name="back" [size]="16" />
+    {{ 'studios.back' | translate }}
+  </a>
+
+  <h2 class="font-display text-2xl font-semibold mb-6">
+    {{ (studioId() ? 'studios.form.edit_title' : 'studios.form.create_title') | translate }}
+  </h2>
+
+  <div class="space-y-4 bg-gs-dark-gray border border-gs-border rounded-xl p-6">
+    <label class="block">
+      <span class="text-sm text-gs-light/70">{{ 'studios.form.name' | translate }}</span>
+      <input type="text" [ngModel]="name()" (ngModelChange)="name.set($event)"
+        class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue" />
+    </label>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <label class="block">
+        <span class="text-sm text-gs-light/70">{{ 'studios.form.type' | translate }}</span>
+        <select [ngModel]="type()" (ngModelChange)="type.set($event)"
+          class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue">
+          @for (t of types; track t) { <option [value]="t">{{ ('studios.type.' + t) | translate }}</option> }
+        </select>
+      </label>
+      <label class="block">
+        <span class="text-sm text-gs-light/70">{{ 'studios.form.status' | translate }}</span>
+        <select [ngModel]="status()" (ngModelChange)="status.set($event)"
+          class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue">
+          @for (s of statuses; track s) { <option [value]="s">{{ ('studios.status.' + s) | translate }}</option> }
+        </select>
+      </label>
+      <label class="block">
+        <span class="text-sm text-gs-light/70">{{ 'studios.capacity' | translate }}</span>
+        <input type="number" min="1" [ngModel]="capacity()" (ngModelChange)="capacity.set($event)"
+          class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue" />
+      </label>
+    </div>
+
+    <label class="block">
+      <span class="text-sm text-gs-light/70">{{ 'studios.hourly_price' | translate }} (MGA)</span>
+      <input type="number" min="0" [ngModel]="hourlyPrice()" (ngModelChange)="hourlyPrice.set($event)"
+        class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue" />
+    </label>
+
+    <label class="block">
+      <span class="text-sm text-gs-light/70">{{ 'studios.form.description' | translate }}</span>
+      <textarea rows="2" [ngModel]="description()" (ngModelChange)="description.set($event)"
+        class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"></textarea>
+    </label>
+
+    <label class="block">
+      <span class="text-sm text-gs-light/70">{{ 'studios.equipment' | translate }}</span>
+      <input type="text" [ngModel]="equipmentSummary()" (ngModelChange)="equipmentSummary.set($event)"
+        class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue" />
+    </label>
+
+    @if (error()) {
+      <p class="text-sm text-gs-orange">{{ 'studios.form.error' | translate }}</p>
+    }
+
+    <div class="flex items-center gap-3 pt-2">
+      <button type="button" (click)="submit()" [disabled]="saving()"
+        class="inline-flex items-center gap-2 rounded-md bg-gs-blue px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90 disabled:opacity-50">
+        <gs-icon name="check" [size]="16" />
+        {{ 'studios.form.save' | translate }}
+      </button>
+      <a routerLink="/studios" class="text-sm text-gs-light/60 hover:text-gs-light">{{ 'studios.form.cancel' | translate }}</a>
+    </div>
+  </div>
+</div>
