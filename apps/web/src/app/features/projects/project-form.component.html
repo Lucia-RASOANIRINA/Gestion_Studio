@@ -13,7 +13,7 @@
 </div>
 
 @if (projectId()) {
-  <div class="max-w-2xl bg-gs-dark-gray border border-white/5 rounded-xl p-6 mb-4">
+  <div class="max-w-2xl bg-gs-dark-gray border border-gs-border rounded-xl p-6 mb-4">
     <p class="text-sm text-gs-light/60 mb-3">{{ 'projects.form.workflow' | translate }}</p>
     <div class="flex flex-wrap gap-2">
       @for (status of nextStatuses; track status) {
@@ -32,19 +32,42 @@
       <p class="text-gs-orange text-xs mt-3">{{ errorKey | translate }}</p>
     }
   </div>
+
+  <!-- Chronologie / timeline des étapes -->
+  <div class="max-w-2xl bg-gs-dark-gray border border-gs-border rounded-xl p-6 mb-4">
+    <p class="text-sm text-gs-light/60 mb-4">{{ 'projects.form.timeline' | translate }}</p>
+    <ol class="flex items-center overflow-x-auto pb-2">
+      @for (status of statuses; track status; let i = $index; let last = $last) {
+        <li class="flex items-center flex-shrink-0">
+          <div class="flex flex-col items-center gap-1 w-20 text-center">
+            <span
+              class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold"
+              [class]="i < currentStatusIndex ? 'bg-gs-green text-gs-black' : (i === currentStatusIndex ? 'bg-gs-blue text-gs-black' : 'bg-gs-hover text-gs-light/50')"
+            >
+              @if (i < currentStatusIndex) { <gs-icon name="check" [size]="14" /> } @else { {{ i + 1 }} }
+            </span>
+            <span class="text-[10px] leading-tight text-gs-light/60">{{ ('projects.status.' + status) | translate }}</span>
+          </div>
+          @if (!last) {
+            <span class="h-0.5 w-6 flex-shrink-0" [class]="i < currentStatusIndex ? 'bg-gs-green' : 'bg-gs-hover'"></span>
+          }
+        </li>
+      }
+    </ol>
+  </div>
 }
 
 <form
   [formGroup]="form"
   (ngSubmit)="submit()"
-  class="max-w-2xl bg-gs-dark-gray border border-white/5 rounded-xl p-6 space-y-4"
+  class="max-w-2xl bg-gs-dark-gray border border-gs-border rounded-xl p-6 space-y-4"
 >
   <div>
     <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.title' | translate }}</label>
     <input
       type="text"
       formControlName="title"
-      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     />
     @if (form.controls.title.invalid && form.controls.title.touched) {
       <p class="text-gs-orange text-xs mt-1">{{ 'projects.form.title_error' | translate }}</p>
@@ -56,7 +79,7 @@
       <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.client' | translate }}</label>
       <select
         formControlName="clientId"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       >
         <option value="" disabled>{{ 'projects.form.client_placeholder' | translate }}</option>
         @for (client of clients(); track client.id) {
@@ -71,7 +94,7 @@
       <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.service_type' | translate }}</label>
       <select
         formControlName="serviceType"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       >
         @for (type of serviceTypes; track type) {
           <option [value]="type">{{ ('projects.service_type.' + type) | translate }}</option>
@@ -85,7 +108,7 @@
     <textarea
       formControlName="description"
       rows="3"
-      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     ></textarea>
   </div>
 
@@ -96,14 +119,14 @@
         type="number"
         min="0"
         formControlName="budgetAmount"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       />
     </div>
     <div>
       <label class="block text-sm text-gs-light/70 mb-1">{{ 'projects.form.currency' | translate }}</label>
       <select
         formControlName="budgetCurrency"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       >
         @for (currency of currencies; track currency) {
           <option [value]="currency">{{ currency }}</option>
@@ -119,7 +142,7 @@
       <input
         type="date"
         formControlName="startDate"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       />
     </div>
     <div>
@@ -127,9 +150,52 @@
       <input
         type="date"
         formControlName="dueDate"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       />
     </div>
+  </div>
+
+  <!-- Avancement -->
+  <div>
+    <div class="flex items-center justify-between mb-1">
+      <label class="block text-sm text-gs-light/70">{{ 'projects.form.progress' | translate }}</label>
+      <span class="text-sm font-semibold text-gs-blue">{{ form.controls.progress.value }}%</span>
+    </div>
+    <input
+      type="range"
+      min="0"
+      max="100"
+      step="5"
+      formControlName="progress"
+      class="w-full accent-gs-blue"
+    />
+    <div class="mt-2 h-2 rounded-full bg-gs-hover overflow-hidden">
+      <div class="h-full rounded-full bg-gs-blue transition-all" [style.width.%]="form.controls.progress.value"></div>
+    </div>
+  </div>
+
+  <!-- Check-list avant livraison -->
+  <div>
+    <label class="block text-sm text-gs-light/70 mb-2">{{ 'projects.form.checklist' | translate }}</label>
+    <ul class="space-y-2">
+      @for (item of checklist(); track $index) {
+        <li>
+          <button
+            type="button"
+            (click)="toggleChecklistItem($index)"
+            class="flex w-full items-center gap-2 rounded-md border border-gs-border px-3 py-2 text-sm text-left hover:bg-gs-hover"
+          >
+            <span
+              class="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border"
+              [class]="item.done ? 'bg-gs-green border-gs-green text-gs-black' : 'border-gs-border'"
+            >
+              @if (item.done) { <gs-icon name="check" [size]="12" /> }
+            </span>
+            <span [class.line-through]="item.done" [class.opacity-50]="item.done">{{ item.label }}</span>
+          </button>
+        </li>
+      }
+    </ul>
   </div>
 
   @if (serverError(); as errorKey) {

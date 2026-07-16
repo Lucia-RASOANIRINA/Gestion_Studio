@@ -12,6 +12,13 @@
   </a>
 </div>
 
+@if (error(); as errorKey) {
+  <div class="flex items-center gap-2 rounded-md border border-gs-orange/40 bg-gs-orange/10 text-gs-orange text-sm px-4 py-3 mb-4">
+    <gs-icon name="alert" [size]="16" />
+    {{ errorKey | translate }}
+  </div>
+}
+
 <div class="flex flex-col sm:flex-row gap-3 mb-4">
   <div class="relative flex-1">
     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gs-light/40">
@@ -22,13 +29,13 @@
       [(ngModel)]="search"
       (ngModelChange)="load()"
       [placeholder]="'projects.search_placeholder' | translate"
-      class="w-full rounded-md bg-gs-dark-gray border border-white/10 pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-dark-gray border border-gs-border pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     />
   </div>
   <select
     [(ngModel)]="statusFilter"
     (ngModelChange)="load()"
-    class="rounded-md bg-gs-dark-gray border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    class="rounded-md bg-gs-dark-gray border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
   >
     <option value="">{{ 'projects.all_statuses' | translate }}</option>
     @for (status of statuses; track status) {
@@ -37,10 +44,10 @@
   </select>
 </div>
 
-<div class="bg-gs-dark-gray border border-white/5 rounded-xl overflow-x-auto">
+<div class="bg-gs-dark-gray border border-gs-border rounded-xl overflow-x-auto">
   <table class="w-full text-sm">
     <thead>
-      <tr class="text-left text-gs-light/50 border-b border-white/5">
+      <tr class="text-left text-gs-light/50 border-b border-gs-border">
         <th class="px-4 py-3 font-medium">{{ 'projects.table.reference' | translate }}</th>
         <th class="px-4 py-3 font-medium">{{ 'projects.table.title' | translate }}</th>
         <th class="px-4 py-3 font-medium hidden md:table-cell">{{ 'projects.table.client' | translate }}</th>
@@ -51,7 +58,7 @@
     </thead>
     <tbody>
       @for (project of projects(); track project.id) {
-        <tr class="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+        <tr class="border-b border-gs-border last:border-0 hover:bg-gs-hover">
           <td class="px-4 py-3 font-mono text-xs text-gs-light/70">{{ project.reference }}</td>
           <td class="px-4 py-3">
             <a [routerLink]="['/projects', project.id]" class="font-medium hover:text-gs-blue">{{ project.title }}</a>

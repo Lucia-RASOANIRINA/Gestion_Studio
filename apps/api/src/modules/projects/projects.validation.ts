@@ -10,6 +10,11 @@ export const createProjectSchema = z.object({
   budgetCurrency: z.nativeEnum(Currency).default(Currency.MGA),
   startDate: z.coerce.date().optional(),
   dueDate: z.coerce.date().optional(),
+  progress: z.coerce.number().int().min(0).max(100).optional(),
+  checklist: z
+    .array(z.object({ label: z.string().trim().min(1).max(200), done: z.boolean() }))
+    .max(50)
+    .optional(),
 });
 
 export const updateProjectSchema = createProjectSchema.partial();

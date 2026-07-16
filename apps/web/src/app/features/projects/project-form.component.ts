@@ -3,9 +3,18 @@ import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { TranslateModule } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
+import { resolveErrorMessageKey } from "../../shared/http-error.util";
 import type { Client } from "../clients/client.model";
 import { ClientsService } from "../clients/clients.service";
-import { Currency, PROJECT_TRANSITIONS, SERVICE_TYPES, type Project, type ProjectStatus } from "./project.model";
+import {
+  Currency,
+  DEFAULT_CHECKLIST,
+  PROJECT_STATUSES,
+  PROJECT_TRANSITIONS,
+  SERVICE_TYPES,
+  type ChecklistItem,
+  type ProjectStatus,
+} from "./project.model";
 import { ProjectsService } from "./projects.service";
 
 @Component({
@@ -30,6 +39,9 @@ export class ProjectFormComponent implements OnInit {
   readonly currentStatus = signal<ProjectStatus | null>(null);
   readonly transitionError = signal<string | null>(null);
 
+  readonly statuses = PROJECT_STATUSES;
+  readonly checklist = signal<ChecklistItem[]>(DEFAULT_CHECKLIST.map((item) => ({ ...item })));
+
   readonly form = this.fb.nonNullable.group({
     title: ["", [Validators.required, Validators.minLength(2), Validators.maxLength(200)]],
     clientId: ["", Validators.required],
@@ -39,6 +51,7 @@ export class ProjectFormComponent implements OnInit {
     budgetCurrency: [Currency.MGA],
     startDate: [""],
     dueDate: [""],
+    progress: [0],
   });
 
   get nextStatuses(): ProjectStatus[] {
@@ -46,15 +59,35 @@ export class ProjectFormComponent implements OnInit {
     return status ? PROJECT_TRANSITIONS[status] : [];
   }
 
+  /** Index de l'étape courante dans la timeline des statuts. */
+  get currentStatusIndex(): number {
+    const status = this.currentStatus();
+    return status ? PROJECT_STATUSES.indexOf(status) : -1;
+  }
+
+  toggleChecklistItem(index: number): void {
+    this.checklist.update((items) =>
+      items.map((item, i) => (i === index ? { ...item, done: !item.done } : item))
+    );
+  }
+
   async ngOnInit(): Promise<void> {
-    const { items } = await this.clientsService.list({ pageSize: 100 });
-    this.clients.set(items);
+    try {
+      const { items } = await this.clientsService.list({ pageSize: 100 });
+      this.clients.set(items);
+    } catch {
+      this.serverError.set("common.errors.network");
+    }
 
     const id = this.route.snapshot.paramMap.get("id");
     if (!id) return;
 
     this.projectId.set(id);
-    await this.loadProject(id);
+    try {
+      await this.loadProject(id);
+    } catch {
+      await this.router.navigateByUrl("/projects");
+    }
   }
 
   private async loadProject(id: string): Promise<void> {
@@ -69,7 +102,11 @@ export class ProjectFormComponent implements OnInit {
       budgetCurrency: project.budgetCurrency,
       startDate: project.startDate ? project.startDate.substring(0, 10) : "",
       dueDate: project.dueDate ? project.dueDate.substring(0, 10) : "",
+      progress: project.progress ?? 0,
     });
+    if (project.checklist && project.checklist.length > 0) {
+      this.checklist.set(project.checklist.map((item) => ({ ...item })));
+    }
   }
 
   async submit(): Promise<void> {
@@ -87,6 +124,8 @@ export class ProjectFormComponent implements OnInit {
       description: raw.description || undefined,
       startDate: raw.startDate || undefined,
       dueDate: raw.dueDate || undefined,
+      progress: Number(raw.progress) || 0,
+      checklist: this.checklist(),
     };
 
     try {
@@ -96,8 +135,8 @@ export class ProjectFormComponent implements OnInit {
         await this.projectsService.create(value);
       }
       await this.router.navigateByUrl("/projects");
-    } catch {
-      this.serverError.set("projects.form.error");
+    } catch (error) {
+      this.serverError.set(resolveErrorMessageKey(error));
     } finally {
       this.saving.set(false);
     }
@@ -109,20 +148,20 @@ export class ProjectFormComponent implements OnInit {
     try {
       const updated = await this.projectsService.transition(this.projectId()!, status);
       this.currentStatus.set(updated.status);
-    } catch {
-      this.transitionError.set("projects.form.transition_error");
+    } catch (error) {
+      this.transitionError.set(resolveErrorMessageKey(error, { 403: "projects.form.transition_error" }));
     }
   }
 
   statusBadgeClass(status: string | null): string {
     const classes: Record<string, string> = {
-      QUOTE: "bg-white/10 text-gs-light/70",
+      QUOTE: "bg-gs-hover text-gs-light/70",
       VALIDATED: "bg-gs-blue/20 text-gs-blue",
       IN_PROGRESS: "bg-gs-violet/20 text-gs-violet",
       REVIEW: "bg-gs-orange/20 text-gs-orange",
       DELIVERED: "bg-gs-green/20 text-gs-green",
       INVOICED: "bg-gs-green/20 text-gs-green",
-      ARCHIVED: "bg-white/5 text-gs-light/40",
+      ARCHIVED: "bg-gs-hover text-gs-light/40",
     };
     return classes[status ?? "QUOTE"] ?? classes["QUOTE"];
   }

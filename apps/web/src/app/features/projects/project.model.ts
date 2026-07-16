@@ -37,6 +37,11 @@ export interface ProjectClientRef {
   segment: string;
 }
 
+export interface ChecklistItem {
+  label: string;
+  done: boolean;
+}
+
 export interface Project {
   id: string;
   reference: string;
@@ -48,10 +53,21 @@ export interface Project {
   budgetCurrency: Currency;
   startDate: string | null;
   dueDate: string | null;
+  progress: number;
+  checklist: ChecklistItem[] | null;
   client: ProjectClientRef;
   createdAt: string;
   updatedAt: string;
 }
+
+/** Check-list « avant livraison » proposée par défaut sur un nouveau projet. */
+export const DEFAULT_CHECKLIST: ChecklistItem[] = [
+  { label: "Mix terminé", done: false },
+  { label: "Master terminé", done: false },
+  { label: "Vérification", done: false },
+  { label: "Paiement", done: false },
+  { label: "Livraison", done: false },
+];
 
 export interface ProjectListResponse {
   items: Project[];
@@ -69,6 +85,8 @@ export interface ProjectFormValue {
   budgetCurrency?: Currency;
   startDate?: string;
   dueDate?: string;
+  progress?: number;
+  checklist?: ChecklistItem[];
 }
 
 export const SERVICE_TYPES: ServiceType[] = [
