@@ -19,7 +19,12 @@
   },
   "notifications": {
     "title": "Notifications",
-    "empty": "No alerts right now.",
+    "empty": "No notifications yet.",
+    "alerts": "Active alerts",
+    "activity": "Recent activity",
+    "mark_all_read": "Mark all as read",
+    "mark_read": "Mark as read",
+    "see_all": "See all notifications",
     "type": {
       "low_stock": "Low stock",
       "overdue_invoice": "Overdue invoice",
@@ -159,12 +164,28 @@
       "submit": "Sign in",
       "error": "Invalid credentials.",
       "code_error": "Invalid authentication code."
+    },
+    "logout": {
+      "title": "Log out",
+      "message": "Are you sure you want to log out?",
+      "confirm": "Log out"
     }
   },
   "common": {
     "language": "Language",
     "loading": "Loading...",
     "coming_soon": "Module coming in a future phase.",
+    "dialog": {
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "delete_title": "Confirm deletion",
+      "delete_named": "Do you really want to delete \"{{name}}\"? This action cannot be undone."
+    },
+    "toast": {
+      "deleted": "Item deleted.",
+      "saved": "Changes saved."
+    },
     "errors": {
       "validation": "The submitted data is invalid. Check the highlighted fields.",
       "unauthorized": "Your session has expired. Please sign in again.",
@@ -209,7 +230,11 @@
     "blacklist": {
       "badge": "Blacklisted",
       "action": "Toggle blacklist",
-      "reason_prompt": "Blocking reason (bad payer, fraud…):"
+      "title": "Blacklist client",
+      "reason_prompt": "Blocking reason (bad payer, fraud…):",
+      "reason_placeholder": "Reason",
+      "on_success": "Client added to the blacklist.",
+      "off_success": "Client removed from the blacklist."
     },
     "form": {
       "create_title": "New client",
@@ -523,6 +548,7 @@
     "cashflow": "Cash flow (6 months)",
     "by_category": "Expenses by category",
     "empty": "No expense recorded.",
+    "added": "Expense recorded.",
     "add_expense": "New expense",
     "expense_label": "Label",
     "expense_category": "Category",

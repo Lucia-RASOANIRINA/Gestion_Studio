@@ -4,6 +4,8 @@ import { RouterLink } from "@angular/router";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
 import { resolveErrorMessageKey } from "../../shared/http-error.util";
+import { DialogService } from "../../core/ui/dialog.service";
+import { ToastService } from "../../core/ui/toast.service";
 import { CLIENT_SEGMENTS, type Client } from "./client.model";
 import { ClientsService } from "./clients.service";
 
@@ -16,6 +18,8 @@ import { ClientsService } from "./clients.service";
 export class ClientsListComponent implements OnInit {
   private readonly clientsService = inject(ClientsService);
   private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(DialogService);
+  private readonly toast = inject(ToastService);
 
   readonly segments = CLIENT_SEGMENTS;
   readonly clients = signal<Client[]>([]);
@@ -48,13 +52,21 @@ export class ClientsListComponent implements OnInit {
   }
 
   async remove(client: Client): Promise<void> {
-    if (!confirm(`Supprimer ${client.name} ?`)) return;
+    const confirmed = await this.dialog.confirm({
+      title: this.translate.instant("common.dialog.delete_title"),
+      message: this.translate.instant("common.dialog.delete_named", { name: client.name }),
+      confirmLabel: this.translate.instant("common.dialog.delete"),
+      danger: true,
+      icon: "delete",
+    });
+    if (!confirmed) return;
     try {
       await this.clientsService.remove(client.id);
+      this.toast.success(this.translate.instant("common.toast.deleted"));
       await this.load();
     } catch (error) {
       const key = resolveErrorMessageKey(error, { 400: "clients.delete_conflict", 409: "clients.delete_conflict" });
-      alert(this.translate.instant(key));
+      this.toast.error(this.translate.instant(key));
     }
   }
 
@@ -83,14 +95,24 @@ export class ClientsListComponent implements OnInit {
   async toggleBlacklist(client: Client): Promise<void> {
     let reason: string | null = client.blacklistReason;
     if (!client.isBlacklisted) {
-      reason = prompt(this.translate.instant("clients.blacklist.reason_prompt")) ?? null;
+      reason = await this.dialog.prompt({
+        title: this.translate.instant("clients.blacklist.title"),
+        message: this.translate.instant("clients.blacklist.reason_prompt"),
+        inputPlaceholder: this.translate.instant("clients.blacklist.reason_placeholder"),
+        confirmLabel: this.translate.instant("clients.blacklist.action"),
+        danger: true,
+        icon: "alert",
+      });
       if (reason === null) return; // annulé
     }
     try {
       const updated = await this.clientsService.setBlacklist(client.id, !client.isBlacklisted, reason);
       this.clients.update((list) => list.map((c) => (c.id === updated.id ? updated : c)));
+      this.toast.success(
+        this.translate.instant(updated.isBlacklisted ? "clients.blacklist.on_success" : "clients.blacklist.off_success")
+      );
     } catch (error) {
-      alert(this.translate.instant(resolveErrorMessageKey(error)));
+      this.toast.error(this.translate.instant(resolveErrorMessageKey(error)));
     }
   }
 }

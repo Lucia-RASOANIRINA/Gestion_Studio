@@ -2,8 +2,10 @@ import { DatePipe, DecimalPipe } from "@angular/common";
 import { Component, ElementRef, computed, inject, signal, viewChild } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
-import { TranslateModule } from "@ngx-translate/core";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
+import { DialogService } from "../../core/ui/dialog.service";
+import { ToastService } from "../../core/ui/toast.service";
 import { BillingService } from "./billing.service";
 import {
   INVOICE_STATUSES,
@@ -23,6 +25,9 @@ export class InvoiceDetailComponent {
   private readonly billing = inject(BillingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(DialogService);
+  private readonly toast = inject(ToastService);
 
   readonly invoice = signal<Invoice | null>(null);
   readonly loading = signal(true);
@@ -191,10 +196,17 @@ export class InvoiceDetailComponent {
   async remove(): Promise<void> {
     const current = this.invoice();
     if (!current) return;
-    // eslint-disable-next-line no-alert
-    if (!confirm(current.reference)) return;
+    const confirmed = await this.dialog.confirm({
+      title: this.translate.instant("common.dialog.delete_title"),
+      message: this.translate.instant("common.dialog.delete_named", { name: current.reference }),
+      confirmLabel: this.translate.instant("common.dialog.delete"),
+      danger: true,
+      icon: "delete",
+    });
+    if (!confirmed) return;
     try {
       await this.billing.remove(current.id);
+      this.toast.success(this.translate.instant("common.toast.deleted"));
       await this.router.navigate(["/billing"]);
     } catch {
       this.error.set(true);

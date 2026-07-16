@@ -13,6 +13,7 @@ import {
   LucideDownload,
   LucideFolderKanban,
   LucideGlobe,
+  LucideInfo,
   LucideLayoutDashboard,
   LucideLock,
   LucideLogOut,
@@ -64,7 +65,8 @@ export type IconName =
   | "moon"
   | "user"
   | "bell"
-  | "studios";
+  | "studios"
+  | "info";
 
 @Component({
   selector: "gs-icon",
@@ -101,6 +103,7 @@ export type IconName =
     LucideUser,
     LucideBell,
     LucideBuilding2,
+    LucideInfo,
   ],
   template: `
     @switch (name()) {
@@ -196,6 +199,9 @@ export type IconName =
       }
       @case ("studios") {
         <svg lucideBuilding2 [size]="size()"></svg>
+      }
+      @case ("info") {
+        <svg lucideInfo [size]="size()"></svg>
       }
     }
   `,

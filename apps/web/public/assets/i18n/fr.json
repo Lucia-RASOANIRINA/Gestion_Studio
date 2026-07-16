@@ -19,7 +19,12 @@
   },
   "notifications": {
     "title": "Notifications",
-    "empty": "Aucune alerte pour le moment.",
+    "empty": "Aucune notification pour le moment.",
+    "alerts": "Alertes en cours",
+    "activity": "Activité récente",
+    "mark_all_read": "Tout marquer comme lu",
+    "mark_read": "Marquer comme lu",
+    "see_all": "Voir toutes les notifications",
     "type": {
       "low_stock": "Stock bas",
       "overdue_invoice": "Facture en retard",
@@ -159,12 +164,28 @@
       "submit": "Se connecter",
       "error": "Identifiants invalides.",
       "code_error": "Code d'authentification invalide."
+    },
+    "logout": {
+      "title": "Déconnexion",
+      "message": "Voulez-vous vraiment vous déconnecter ?",
+      "confirm": "Se déconnecter"
     }
   },
   "common": {
     "language": "Langue",
     "loading": "Chargement...",
     "coming_soon": "Module à venir dans une prochaine phase.",
+    "dialog": {
+      "confirm": "Confirmer",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "delete_title": "Confirmer la suppression",
+      "delete_named": "Voulez-vous vraiment supprimer « {{name}} » ? Cette action est irréversible."
+    },
+    "toast": {
+      "deleted": "Élément supprimé.",
+      "saved": "Modifications enregistrées."
+    },
     "errors": {
       "validation": "Les données saisies sont invalides. Vérifiez les champs en surbrillance.",
       "unauthorized": "Votre session a expiré. Veuillez vous reconnecter.",
@@ -209,7 +230,11 @@
     "blacklist": {
       "badge": "Blacklisté",
       "action": "Basculer la blacklist",
-      "reason_prompt": "Motif du blocage (mauvais payeur, fraude…) :"
+      "title": "Blacklister le client",
+      "reason_prompt": "Motif du blocage (mauvais payeur, fraude…) :",
+      "reason_placeholder": "Motif",
+      "on_success": "Client ajouté à la blacklist.",
+      "off_success": "Client retiré de la blacklist."
     },
     "form": {
       "create_title": "Nouveau client",
@@ -523,6 +548,7 @@
     "cashflow": "Flux de trésorerie (6 mois)",
     "by_category": "Dépenses par catégorie",
     "empty": "Aucune dépense enregistrée.",
+    "added": "Dépense enregistrée.",
     "add_expense": "Nouvelle dépense",
     "expense_label": "Libellé",
     "expense_category": "Catégorie",

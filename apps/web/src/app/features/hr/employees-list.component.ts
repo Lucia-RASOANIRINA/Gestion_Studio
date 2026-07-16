@@ -1,8 +1,10 @@
 import { DecimalPipe } from "@angular/common";
 import { Component, inject, signal } from "@angular/core";
 import { RouterLink } from "@angular/router";
-import { TranslateModule } from "@ngx-translate/core";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
+import { DialogService } from "../../core/ui/dialog.service";
+import { ToastService } from "../../core/ui/toast.service";
 import { HrService } from "./hr.service";
 import type { Employee, EmployeeType } from "./hr.model";
 
@@ -14,6 +16,9 @@ import type { Employee, EmployeeType } from "./hr.model";
 })
 export class EmployeesListComponent {
   private readonly hr = inject(HrService);
+  private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(DialogService);
+  private readonly toast = inject(ToastService);
 
   readonly items = signal<Employee[]>([]);
   readonly loading = signal(true);
@@ -33,9 +38,18 @@ export class EmployeesListComponent {
   }
 
   async remove(employee: Employee): Promise<void> {
-    // eslint-disable-next-line no-alert
-    if (!confirm(`${employee.firstName} ${employee.lastName}`)) return;
+    const confirmed = await this.dialog.confirm({
+      title: this.translate.instant("common.dialog.delete_title"),
+      message: this.translate.instant("common.dialog.delete_named", {
+        name: `${employee.firstName} ${employee.lastName}`,
+      }),
+      confirmLabel: this.translate.instant("common.dialog.delete"),
+      danger: true,
+      icon: "delete",
+    });
+    if (!confirmed) return;
     await this.hr.removeEmployee(employee.id);
+    this.toast.success(this.translate.instant("common.toast.deleted"));
     await this.load();
   }
 

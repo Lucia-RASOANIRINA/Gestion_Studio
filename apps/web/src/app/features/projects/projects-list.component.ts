@@ -4,6 +4,8 @@ import { RouterLink } from "@angular/router";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
 import { resolveErrorMessageKey } from "../../shared/http-error.util";
+import { DialogService } from "../../core/ui/dialog.service";
+import { ToastService } from "../../core/ui/toast.service";
 import { PROJECT_STATUSES, type Project } from "./project.model";
 import { ProjectsService } from "./projects.service";
 
@@ -16,6 +18,8 @@ import { ProjectsService } from "./projects.service";
 export class ProjectsListComponent implements OnInit {
   private readonly projectsService = inject(ProjectsService);
   private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(DialogService);
+  private readonly toast = inject(ToastService);
 
   readonly statuses = PROJECT_STATUSES;
   readonly projects = signal<Project[]>([]);
@@ -48,12 +52,20 @@ export class ProjectsListComponent implements OnInit {
   }
 
   async remove(project: Project): Promise<void> {
-    if (!confirm(`Supprimer ${project.reference} ?`)) return;
+    const confirmed = await this.dialog.confirm({
+      title: this.translate.instant("common.dialog.delete_title"),
+      message: this.translate.instant("common.dialog.delete_named", { name: project.reference }),
+      confirmLabel: this.translate.instant("common.dialog.delete"),
+      danger: true,
+      icon: "delete",
+    });
+    if (!confirmed) return;
     try {
       await this.projectsService.remove(project.id);
+      this.toast.success(this.translate.instant("common.toast.deleted"));
       await this.load();
     } catch (error) {
-      alert(this.translate.instant(resolveErrorMessageKey(error)));
+      this.toast.error(this.translate.instant(resolveErrorMessageKey(error)));
     }
   }
 

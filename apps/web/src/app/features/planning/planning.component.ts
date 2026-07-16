@@ -4,6 +4,8 @@ import { RouterLink } from "@angular/router";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
 import { resolveErrorMessageKey } from "../../shared/http-error.util";
+import { DialogService } from "../../core/ui/dialog.service";
+import { ToastService } from "../../core/ui/toast.service";
 import {
   addDays,
   addMonths,
@@ -28,6 +30,8 @@ type ViewMode = "day" | "week" | "month";
 export class PlanningComponent implements OnInit {
   private readonly planningService = inject(PlanningService);
   private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(DialogService);
+  private readonly toast = inject(ToastService);
 
   readonly studios = STUDIO_ROOMS;
   readonly view = signal<ViewMode>("day");
@@ -162,12 +166,20 @@ export class PlanningComponent implements OnInit {
 
   async remove(booking: Booking, event: Event): Promise<void> {
     event.stopPropagation();
-    if (!confirm(`Supprimer "${booking.title}" ?`)) return;
+    const confirmed = await this.dialog.confirm({
+      title: this.translate.instant("common.dialog.delete_title"),
+      message: this.translate.instant("common.dialog.delete_named", { name: booking.title }),
+      confirmLabel: this.translate.instant("common.dialog.delete"),
+      danger: true,
+      icon: "delete",
+    });
+    if (!confirmed) return;
     try {
       await this.planningService.remove(booking.id);
+      this.toast.success(this.translate.instant("common.toast.deleted"));
       await this.load();
     } catch (error) {
-      alert(this.translate.instant(resolveErrorMessageKey(error)));
+      this.toast.error(this.translate.instant(resolveErrorMessageKey(error)));
     }
   }
 

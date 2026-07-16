@@ -4,6 +4,8 @@ import { RouterLink } from "@angular/router";
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
 import { resolveErrorMessageKey } from "../../shared/http-error.util";
+import { DialogService } from "../../core/ui/dialog.service";
+import { ToastService } from "../../core/ui/toast.service";
 import { ConsumableService } from "./consumable.service";
 import { EquipmentService } from "./equipment.service";
 import { EQUIPMENT_CATEGORIES, EQUIPMENT_STATUSES, type Consumable, type Equipment } from "./resource.model";
@@ -20,6 +22,18 @@ export class ResourcesComponent implements OnInit {
   private readonly equipmentService = inject(EquipmentService);
   private readonly consumableService = inject(ConsumableService);
   private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(DialogService);
+  private readonly toast = inject(ToastService);
+
+  private async confirmDelete(name: string): Promise<boolean> {
+    return this.dialog.confirm({
+      title: this.translate.instant("common.dialog.delete_title"),
+      message: this.translate.instant("common.dialog.delete_named", { name }),
+      confirmLabel: this.translate.instant("common.dialog.delete"),
+      danger: true,
+      icon: "delete",
+    });
+  }
 
   readonly categories = EQUIPMENT_CATEGORIES;
   readonly statuses = EQUIPMENT_STATUSES;
@@ -84,22 +98,24 @@ export class ResourcesComponent implements OnInit {
   }
 
   async removeEquipment(item: Equipment): Promise<void> {
-    if (!confirm(`Supprimer ${item.name} ?`)) return;
+    if (!(await this.confirmDelete(item.name))) return;
     try {
       await this.equipmentService.remove(item.id);
+      this.toast.success(this.translate.instant("common.toast.deleted"));
       await this.loadEquipment();
     } catch (error) {
-      alert(this.translate.instant(resolveErrorMessageKey(error)));
+      this.toast.error(this.translate.instant(resolveErrorMessageKey(error)));
     }
   }
 
   async removeConsumable(item: Consumable): Promise<void> {
-    if (!confirm(`Supprimer ${item.name} ?`)) return;
+    if (!(await this.confirmDelete(item.name))) return;
     try {
       await this.consumableService.remove(item.id);
+      this.toast.success(this.translate.instant("common.toast.deleted"));
       await this.loadConsumables();
     } catch (error) {
-      alert(this.translate.instant(resolveErrorMessageKey(error)));
+      this.toast.error(this.translate.instant(resolveErrorMessageKey(error)));
     }
   }
 
@@ -108,7 +124,7 @@ export class ResourcesComponent implements OnInit {
       await this.consumableService.adjust(item.id, delta);
       await this.loadConsumables();
     } catch (error) {
-      alert(this.translate.instant(resolveErrorMessageKey(error, { 400: "resources.consumables.adjust_error" })));
+      this.toast.error(this.translate.instant(resolveErrorMessageKey(error, { 400: "resources.consumables.adjust_error" })));
     }
   }
 

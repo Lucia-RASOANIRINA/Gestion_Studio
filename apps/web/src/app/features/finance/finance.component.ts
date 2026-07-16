@@ -2,8 +2,10 @@ import { DatePipe, DecimalPipe } from "@angular/common";
 import { Component, computed, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
-import { TranslateModule } from "@ngx-translate/core";
+import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { GsIconComponent } from "../../shared/icon/icon.component";
+import { DialogService } from "../../core/ui/dialog.service";
+import { ToastService } from "../../core/ui/toast.service";
 import { FinanceService } from "./finance.service";
 import {
   EXPENSE_CATEGORIES,
@@ -20,6 +22,9 @@ import {
 })
 export class FinanceComponent {
   private readonly finance = inject(FinanceService);
+  private readonly translate = inject(TranslateService);
+  private readonly dialog = inject(DialogService);
+  private readonly toast = inject(ToastService);
 
   readonly treasury = signal<Treasury | null>(null);
   readonly expenses = signal<Expense[]>([]);
@@ -72,6 +77,7 @@ export class FinanceComponent {
       this.newLabel.set("");
       this.newAmount.set(null);
       this.newCategory.set("OTHER");
+      this.toast.success(this.translate.instant("finance.added"));
       await this.load();
     } finally {
       this.saving.set(false);
@@ -79,9 +85,16 @@ export class FinanceComponent {
   }
 
   async removeExpense(expense: Expense): Promise<void> {
-    // eslint-disable-next-line no-alert
-    if (!confirm(expense.label)) return;
+    const confirmed = await this.dialog.confirm({
+      title: this.translate.instant("common.dialog.delete_title"),
+      message: this.translate.instant("common.dialog.delete_named", { name: expense.label }),
+      confirmLabel: this.translate.instant("common.dialog.delete"),
+      danger: true,
+      icon: "delete",
+    });
+    if (!confirmed) return;
     await this.finance.removeExpense(expense.id);
+    this.toast.success(this.translate.instant("common.toast.deleted"));
     await this.load();
   }
 

@@ -3,11 +3,13 @@ import { Title } from "@angular/platform-browser";
 import { RouterOutlet } from "@angular/router";
 import { TranslateService } from "@ngx-translate/core";
 import { ThemeService } from "./core/theme/theme.service";
+import { ConfirmDialogComponent } from "./shared/ui/confirm-dialog.component";
+import { ToastContainerComponent } from "./shared/ui/toast-container.component";
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ConfirmDialogComponent, ToastContainerComponent],
   templateUrl: "./app.component.html",
 })
 export class AppComponent {
