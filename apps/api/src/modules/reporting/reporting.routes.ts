@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { PermissionAction, PermissionModule } from "@prisma/client";
 import { authenticate } from "../../common/middleware/authenticate";
+import { asyncHandler } from "../../common/middleware/asyncHandler";
 import { requirePermission } from "../../common/rbac/requirePermission";
 import { getDashboardHandler } from "./reporting.controller";
 
@@ -10,5 +11,5 @@ reportingRouter.use(authenticate);
 reportingRouter.get(
   "/dashboard",
   requirePermission(PermissionModule.REPORTING, PermissionAction.READ),
-  getDashboardHandler
+  asyncHandler(getDashboardHandler)
 );

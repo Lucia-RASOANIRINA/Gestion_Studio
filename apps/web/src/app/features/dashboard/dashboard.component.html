@@ -1,16 +1,163 @@
-<h2 class="font-display text-2xl font-semibold mb-2">{{ 'nav.dashboard' | translate }}</h2>
+<div class="flex items-center gap-2 mb-1">
+  <gs-icon name="dashboard" [size]="22" class="text-gs-blue" />
+  <h2 class="font-display text-2xl font-semibold">{{ 'nav.dashboard' | translate }}</h2>
+</div>
 <p class="text-gs-light/60 mb-6">{{ 'dashboard.subtitle' | translate }}</p>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-  @for (stat of stats; track stat.labelKey) {
-    <div class="bg-gs-dark-gray border border-white/5 rounded-xl p-5 flex items-center gap-4 hover:border-gs-blue/40 transition-colors">
-      <div class="flex items-center justify-center w-11 h-11 rounded-lg bg-gs-navy text-gs-blue flex-shrink-0">
-        <gs-icon [name]="stat.icon" [size]="20" />
+@if (loading()) {
+  <p class="text-gs-light/60">{{ 'common.loading' | translate }}</p>
+} @else {
+  @if (data(); as d) {
+  <!-- KPIs -->
+  <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
+    @for (kpi of kpis(); track kpi.labelKey) {
+      <div class="bg-gs-dark-gray border border-gs-border rounded-xl p-4 hover:border-gs-blue/40 transition-colors">
+        <div class="flex items-center justify-between">
+          <p class="text-xs uppercase tracking-wide text-gs-light/50 truncate">{{ kpi.labelKey | translate }}</p>
+          <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gs-navy" [class]="kpi.accent">
+            <gs-icon [name]="kpi.icon" [size]="16" />
+          </span>
+        </div>
+        <p class="mt-2 font-display text-xl font-semibold" [class]="kpi.accent">
+          {{ kpi.value | number }}@switch (kpi.suffix) {
+            @case ('money') {<span class="text-xs text-gs-light/40"> MGA</span>}
+            @case ('percent') {<span class="text-sm text-gs-light/40">%</span>}
+            @case ('days') {<span class="text-xs text-gs-light/40"> {{ 'dashboard.days' | translate }}</span>}
+          }
+        </p>
       </div>
-      <div class="min-w-0">
-        <p class="text-sm text-gs-light/60 truncate">{{ stat.labelKey | translate }}</p>
-        <p class="font-display text-xl font-semibold">{{ stat.value }}</p>
+    }
+  </div>
+
+  <!-- Graphiques -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+      <h3 class="font-display text-lg font-semibold mb-4">{{ 'dashboard.charts.revenue' | translate }}</h3>
+      <div class="space-y-3">
+        @for (m of d.revenueByMonth; track m.month) {
+          <div>
+            <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+              <span>{{ m.month }}</span><span>{{ m.amount | number }} MGA</span>
+            </div>
+            <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+              <div class="h-full rounded-full bg-gs-green" [style.width]="barWidth(m.amount, maxRevenue())"></div>
+            </div>
+          </div>
+        }
       </div>
-    </div>
+    </section>
+
+    <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+      <h3 class="font-display text-lg font-semibold mb-4">{{ 'dashboard.charts.bookings' | translate }}</h3>
+      <div class="space-y-3">
+        @for (m of d.bookingsByMonth; track m.month) {
+          <div>
+            <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+              <span>{{ m.month }}</span><span>{{ m.count }}</span>
+            </div>
+            <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+              <div class="h-full rounded-full bg-gs-blue" [style.width]="barWidth(m.count, maxBookings())"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+      <h3 class="font-display text-lg font-semibold mb-4">{{ 'dashboard.charts.new_clients' | translate }}</h3>
+      <div class="space-y-3">
+        @for (m of d.newClientsByMonth; track m.month) {
+          <div>
+            <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+              <span>{{ m.month }}</span><span>{{ m.count }}</span>
+            </div>
+            <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+              <div class="h-full rounded-full bg-gs-violet" [style.width]="barWidth(m.count, maxNewClients())"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+      <h3 class="font-display text-lg font-semibold mb-4">{{ 'dashboard.charts.services' | translate }}</h3>
+      <div class="space-y-3">
+        @for (s of d.servicesMostRequested; track s.service) {
+          <div>
+            <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+              <span>{{ ('projects.service_type.' + s.service) | translate }}</span><span>{{ s.count }}</span>
+            </div>
+            <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+              <div class="h-full rounded-full bg-gs-blue" [style.width]="barWidth(s.count, maxService())"></div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+      <h3 class="font-display text-lg font-semibold mb-4">{{ 'dashboard.charts.revenue_by_service' | translate }}</h3>
+      @if (d.revenueByService.length === 0) {
+        <p class="text-sm text-gs-light/50">{{ 'billing.empty' | translate }}</p>
+      } @else {
+        <div class="space-y-3">
+          @for (s of d.revenueByService; track s.service) {
+            <div>
+              <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+                <span>{{ ('projects.service_type.' + s.service) | translate }}</span><span>{{ s.amount | number }} MGA</span>
+              </div>
+              <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+                <div class="h-full rounded-full bg-gs-green" [style.width]="barWidth(s.amount, maxRevenueService())"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+      <h3 class="font-display text-lg font-semibold mb-4">{{ 'reporting.top_clients' | translate }}</h3>
+      @if (d.topClients.length === 0) {
+        <p class="text-sm text-gs-light/50">{{ 'billing.empty' | translate }}</p>
+      } @else {
+        <div class="space-y-3">
+          @for (c of d.topClients; track c.name) {
+            <div>
+              <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+                <span>{{ c.name }}</span><span>{{ c.amount | number }} MGA</span>
+              </div>
+              <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+                <div class="h-full rounded-full bg-gs-violet" [style.width]="barWidth(c.amount, maxTopClient())"></div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  </div>
+
+  <!-- Activités récentes -->
+  <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+    <h3 class="font-display text-lg font-semibold mb-4">{{ 'dashboard.activity.title' | translate }}</h3>
+    @if (d.recentActivity.length === 0) {
+      <p class="text-sm text-gs-light/50">{{ 'dashboard.activity.empty' | translate }}</p>
+    } @else {
+      <ul class="divide-y divide-gs-border">
+        @for (a of d.recentActivity; track $index) {
+          <li class="flex items-center gap-3 py-2.5">
+            <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-gs-navy text-gs-blue">
+              <gs-icon [name]="activityIcon(a.entity)" [size]="15" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm truncate">{{ activityLabel(a) }}</p>
+              <p class="text-xs text-gs-light/50 truncate">
+                {{ a.user ?? ('audit.system' | translate) }} · {{ a.createdAt | date: 'short' }}
+              </p>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </section>
   }
-</div>
+}

@@ -1,0 +1,102 @@
+<div>
+  <div class="flex items-center gap-2 mb-6">
+    <gs-icon name="reporting" [size]="22" class="text-gs-blue" />
+    <h2 class="font-display text-2xl font-semibold">{{ 'nav.reporting' | translate }}</h2>
+  </div>
+
+  @if (loading()) {
+    <p class="text-gs-light/60">{{ 'common.loading' | translate }}</p>
+  } @else if (error()) {
+    <p class="text-gs-orange">{{ 'common.errors.server' | translate }}</p>
+  } @else {
+    @if (data(); as d) {
+    <!-- Tuiles -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+      @for (tile of tiles(); track tile.labelKey) {
+        <div class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+          <div class="flex items-center justify-between">
+            <p class="text-xs uppercase tracking-wide text-gs-light/50">{{ tile.labelKey | translate }}</p>
+            <gs-icon [name]="tile.icon" [size]="16" [class]="tile.accent" />
+          </div>
+          <p class="mt-2 font-display text-2xl font-semibold" [class]="tile.accent">
+            {{ tile.value | number }}@if (tile.isMoney) {<span class="text-sm text-gs-light/40"> MGA</span>}
+          </p>
+        </div>
+      }
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- CA encaissé par mois -->
+      <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+        <h3 class="font-display text-lg font-semibold mb-4">{{ 'reporting.revenue_by_month' | translate }}</h3>
+        <div class="space-y-3">
+          @for (m of d.revenueByMonth; track m.month) {
+            <div>
+              <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+                <span>{{ m.month }}</span>
+                <span>{{ m.amount | number }} MGA</span>
+              </div>
+              <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+                <div class="h-full rounded-full bg-gs-blue" [style.width]="barWidth(m.amount, maxRevenue())"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Projets par statut -->
+      <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+        <h3 class="font-display text-lg font-semibold mb-4">{{ 'reporting.projects_by_status' | translate }}</h3>
+        <div class="space-y-3">
+          @for (p of d.projectsByStatus; track p.status) {
+            <div>
+              <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+                <span>{{ ('projects.status.' + p.status) | translate }}</span>
+                <span>{{ p.count }}</span>
+              </div>
+              <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+                <div class="h-full rounded-full bg-gs-violet" [style.width]="barWidth(p.count, maxProjectCount())"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Top clients -->
+      <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+        <h3 class="font-display text-lg font-semibold mb-4">{{ 'reporting.top_clients' | translate }}</h3>
+        @if (d.topClients.length === 0) {
+          <p class="text-sm text-gs-light/50">{{ 'billing.empty' | translate }}</p>
+        } @else {
+          <div class="space-y-3">
+            @for (c of d.topClients; track c.name) {
+              <div>
+                <div class="flex justify-between text-xs text-gs-light/60 mb-1">
+                  <span>{{ c.name }}</span>
+                  <span>{{ c.amount | number }} MGA</span>
+                </div>
+                <div class="h-2 rounded-full bg-gs-hover overflow-hidden">
+                  <div class="h-full rounded-full bg-gs-green" [style.width]="barWidth(c.amount, maxClientAmount())"></div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Matériel par statut -->
+      <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+        <h3 class="font-display text-lg font-semibold mb-4">{{ 'reporting.equipment_by_status' | translate }}</h3>
+        <div class="flex flex-wrap gap-3">
+          @for (e of d.equipmentByStatus; track e.status) {
+            <div class="flex-1 min-w-[120px] rounded-md border border-gs-border p-3 text-center">
+              <p class="font-display text-2xl font-semibold text-gs-blue">{{ e.count }}</p>
+              <p class="text-xs text-gs-light/60">{{ ('resources.equipment.status.' + e.status) | translate }}</p>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+    }
+  }
+</div>
