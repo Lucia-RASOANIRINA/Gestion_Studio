@@ -355,6 +355,23 @@ model MaintenanceRecord {
   @@map("maintenance_records")
 }
 
+/// Fil de notifications persistant : une entrée par événement métier
+/// (création, mise à jour, paiement, connexion…). L'acteur est dénormalisé
+/// (`actorName`) pour rester lisible même si l'utilisateur est supprimé.
+model Notification {
+  id        String   @id @default(uuid())
+  action    String
+  entity    String
+  entityId  String?
+  actorId   String?
+  actorName String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isRead, createdAt])
+  @@map("notifications")
+}
+
 enum StudioType {
   RECORDING
   PODCAST

@@ -21,12 +21,36 @@ export interface Notification {
 }
 
 const MAINTENANCE_HORIZON_DAYS = 15;
+const FEED_LIMIT = 60;
+
+/** Fil de notifications persistant (événements), plus le nombre de non-lues. */
+export async function getFeed() {
+  const [items, unreadCount] = await Promise.all([
+    prisma.notification.findMany({ orderBy: { createdAt: "desc" }, take: FEED_LIMIT }),
+    prisma.notification.count({ where: { isRead: false } }),
+  ]);
+  return { items, unreadCount };
+}
+
+/** Marque une notification comme lue. */
+export async function markRead(id: string) {
+  return prisma.notification.update({ where: { id }, data: { isRead: true } });
+}
+
+/** Marque toutes les notifications comme lues. */
+export async function markAllRead() {
+  const result = await prisma.notification.updateMany({
+    where: { isRead: false },
+    data: { isRead: true },
+  });
+  return { updated: result.count };
+}
 
 /**
  * Alertes calculées à la volée à partir des données métier : stock bas,
  * factures en retard et maintenances à prévoir. Aucune table dédiée.
  */
-export async function getNotifications(): Promise<{ items: Notification[]; count: number }> {
+export async function getAlerts(): Promise<{ items: Notification[]; count: number }> {
   const now = new Date();
   const horizon = new Date(now.getTime() + MAINTENANCE_HORIZON_DAYS * 24 * 60 * 60 * 1000);
 

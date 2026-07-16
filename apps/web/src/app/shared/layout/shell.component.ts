@@ -1,4 +1,4 @@
-import { NgClass } from "@angular/common";
+import { DatePipe, NgClass } from "@angular/common";
 import { Component, computed, inject, signal } from "@angular/core";
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { filter } from "rxjs";
@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from "@ngx-translate/core";
 import { AuthService } from "../../core/auth/auth.service";
 import { ThemeService } from "../../core/theme/theme.service";
 import { NotificationsService } from "../../core/notifications/notifications.service";
+import { DialogService } from "../../core/ui/dialog.service";
 import { SettingsService } from "../../features/settings/settings.service";
 import { GsIconComponent, type IconName } from "../icon/icon.component";
 
@@ -18,7 +19,7 @@ interface NavItem {
 @Component({
   selector: "gs-shell",
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, GsIconComponent, NgClass],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, TranslateModule, GsIconComponent, NgClass, DatePipe],
   templateUrl: "./shell.component.html",
 })
 export class ShellComponent {
@@ -27,6 +28,7 @@ export class ShellComponent {
   private readonly router = inject(Router);
   private readonly theme = inject(ThemeService);
   private readonly settings = inject(SettingsService);
+  private readonly dialog = inject(DialogService);
   readonly notifications = inject(NotificationsService);
 
   readonly sidebarOpen = signal(false);
@@ -64,6 +66,10 @@ export class ShellComponent {
     if (this.notifOpen()) void this.notifications.refresh();
   }
 
+  markAllRead(): void {
+    void this.notifications.markAllRead();
+  }
+
   private async loadProfile(): Promise<void> {
     try {
       const profile = await this.settings.getProfile();
@@ -91,7 +97,16 @@ export class ShellComponent {
     void this.settings.updateProfile({ locale: lang as "fr" | "en" }).catch(() => undefined);
   }
 
-  logout(): void {
-    void this.auth.logout();
+  async logout(): Promise<void> {
+    const confirmed = await this.dialog.confirm({
+      title: this.translate.instant("auth.logout.title"),
+      message: this.translate.instant("auth.logout.message"),
+      confirmLabel: this.translate.instant("auth.logout.confirm"),
+      cancelLabel: this.translate.instant("common.dialog.cancel"),
+      icon: "logout",
+    });
+    if (confirmed) {
+      void this.auth.logout();
+    }
   }
 }

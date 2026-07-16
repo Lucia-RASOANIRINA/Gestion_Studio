@@ -177,6 +177,11 @@ export const routes: Routes = [
         loadComponent: () => import("./features/reporting/reporting.component").then((m) => m.ReportingComponent),
       },
       {
+        path: "notifications",
+        loadComponent: () =>
+          import("./features/notifications/notifications-page.component").then((m) => m.NotificationsPageComponent),
+      },
+      {
         path: "settings",
         loadComponent: () => import("./features/settings/settings.component").then((m) => m.SettingsComponent),
       },

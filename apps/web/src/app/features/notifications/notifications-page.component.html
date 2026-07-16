@@ -1,0 +1,74 @@
+<div class="max-w-3xl">
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div class="flex items-center gap-2">
+      <gs-icon name="bell" [size]="22" class="text-gs-blue" />
+      <h2 class="font-display text-2xl font-semibold">{{ 'notifications.title' | translate }}</h2>
+    </div>
+    @if (notifications.unreadCount() > 0) {
+      <button type="button" (click)="markAllRead()"
+        class="inline-flex items-center gap-2 rounded-md border border-gs-blue px-4 py-2 text-sm font-semibold text-gs-blue hover:bg-gs-blue hover:text-gs-black">
+        <gs-icon name="check" [size]="16" />
+        {{ 'notifications.mark_all_read' | translate }}
+      </button>
+    }
+  </div>
+
+  <!-- Alertes en cours -->
+  @if (notifications.alerts().length > 0) {
+    <section class="mb-6 rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+      <h3 class="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gs-light/50">
+        <gs-icon name="alert" [size]="15" class="text-gs-orange" />
+        {{ 'notifications.alerts' | translate }}
+      </h3>
+      <ul class="divide-y divide-gs-border">
+        @for (a of notifications.alerts(); track $index) {
+          <a [routerLink]="notifications.routeForAlert(a)" class="flex items-center gap-3 py-2.5 hover:bg-gs-hover -mx-2 px-2 rounded">
+            <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
+              [class]="a.severity === 'danger' ? 'bg-gs-orange/15 text-gs-orange' : 'bg-gs-blue/10 text-gs-blue'">
+              <gs-icon name="alert" [size]="15" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm truncate">{{ a.title }}</p>
+              <p class="text-xs text-gs-light/50">{{ ('notifications.type.' + a.type) | translate }}</p>
+            </div>
+          </a>
+        }
+      </ul>
+    </section>
+  }
+
+  <!-- Fil complet des événements -->
+  <section class="rounded-lg border border-gs-border bg-gs-dark-gray">
+    <h3 class="px-4 py-3 border-b border-gs-border text-sm font-semibold uppercase tracking-wide text-gs-light/50">
+      {{ 'notifications.activity' | translate }}
+    </h3>
+    @if (notifications.items().length === 0) {
+      <p class="px-4 py-8 text-center text-sm text-gs-light/50">{{ 'notifications.empty' | translate }}</p>
+    } @else {
+      <ul class="divide-y divide-gs-border">
+        @for (n of notifications.items(); track n.id) {
+          <a [routerLink]="notifications.routeForNotification(n)"
+            class="flex items-center gap-3 px-4 py-3 hover:bg-gs-hover"
+            [class.opacity-60]="n.isRead">
+            <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gs-navy text-gs-blue">
+              <gs-icon [name]="notifications.iconForEntity(n.entity)" [size]="16" />
+            </span>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm truncate">{{ notifications.label(n) }}</p>
+              <p class="text-xs text-gs-light/50 truncate">
+                {{ n.actorName || ('audit.system' | translate) }} · {{ n.createdAt | date: 'medium' }}
+              </p>
+            </div>
+            @if (!n.isRead) {
+              <button type="button" (click)="markRead($event, n)"
+                class="flex-shrink-0 rounded-md px-2 py-1 text-xs text-gs-blue hover:bg-gs-navy"
+                [title]="'notifications.mark_read' | translate">
+                <gs-icon name="check" [size]="16" />
+              </button>
+            }
+          </a>
+        }
+      </ul>
+    }
+  </section>
+</div>
