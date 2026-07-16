@@ -79,11 +79,98 @@ export const routes: Routes = [
       },
       {
         path: "resources",
-        loadComponent: () => import("./features/resources/resources.component").then((m) => m.ResourcesComponent),
+        children: [
+          {
+            path: "",
+            loadComponent: () =>
+              import("./features/resources/resources.component").then((m) => m.ResourcesComponent),
+          },
+          {
+            path: "equipment/new",
+            loadComponent: () =>
+              import("./features/resources/equipment-form.component").then((m) => m.EquipmentFormComponent),
+          },
+          {
+            path: "equipment/:id/edit",
+            loadComponent: () =>
+              import("./features/resources/equipment-form.component").then((m) => m.EquipmentFormComponent),
+          },
+          {
+            path: "consumables/new",
+            loadComponent: () =>
+              import("./features/resources/consumable-form.component").then((m) => m.ConsumableFormComponent),
+          },
+          {
+            path: "consumables/:id/edit",
+            loadComponent: () =>
+              import("./features/resources/consumable-form.component").then((m) => m.ConsumableFormComponent),
+          },
+        ],
+      },
+      {
+        path: "studios",
+        children: [
+          {
+            path: "",
+            loadComponent: () =>
+              import("./features/studios/studios-list.component").then((m) => m.StudiosListComponent),
+          },
+          {
+            path: "new",
+            loadComponent: () =>
+              import("./features/studios/studio-form.component").then((m) => m.StudioFormComponent),
+          },
+          {
+            path: ":id/edit",
+            loadComponent: () =>
+              import("./features/studios/studio-form.component").then((m) => m.StudioFormComponent),
+          },
+        ],
+      },
+      {
+        path: "hr",
+        children: [
+          {
+            path: "",
+            loadComponent: () =>
+              import("./features/hr/employees-list.component").then((m) => m.EmployeesListComponent),
+          },
+          {
+            path: "new",
+            loadComponent: () =>
+              import("./features/hr/employee-form.component").then((m) => m.EmployeeFormComponent),
+          },
+          {
+            path: ":id/edit",
+            loadComponent: () =>
+              import("./features/hr/employee-form.component").then((m) => m.EmployeeFormComponent),
+          },
+        ],
       },
       {
         path: "billing",
-        loadComponent: () => import("./features/billing/billing.component").then((m) => m.BillingComponent),
+        children: [
+          {
+            path: "",
+            loadComponent: () =>
+              import("./features/billing/billing-list.component").then((m) => m.BillingListComponent),
+          },
+          {
+            path: "new",
+            loadComponent: () =>
+              import("./features/billing/invoice-form.component").then((m) => m.InvoiceFormComponent),
+          },
+          {
+            path: "finance",
+            loadComponent: () =>
+              import("./features/finance/finance.component").then((m) => m.FinanceComponent),
+          },
+          {
+            path: ":id",
+            loadComponent: () =>
+              import("./features/billing/invoice-detail.component").then((m) => m.InvoiceDetailComponent),
+          },
+        ],
       },
       {
         path: "reporting",

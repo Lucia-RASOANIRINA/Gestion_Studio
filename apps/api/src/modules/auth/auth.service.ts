@@ -5,6 +5,7 @@ import { prisma } from "../../config/prisma";
 import { env } from "../../config/env";
 import { AppError } from "../../common/errors/AppError";
 import { recordAuditLog } from "../../common/audit/recordAuditLog";
+import { generateSecret, otpauthUri, verifyToken } from "./totp";
 import type { LoginInput } from "./auth.validation";
 
 const MAX_FAILED_ATTEMPTS = 5;
@@ -18,7 +19,9 @@ async function issueTokens(userId: string, roles: string[]) {
   const accessToken = jwt.sign({ sub: userId, roles }, env.jwt.accessSecret, {
     expiresIn: env.jwt.accessExpiresIn as SignOptions["expiresIn"],
   });
-  const refreshToken = jwt.sign({ sub: userId }, env.jwt.refreshSecret, {
+  // jti aléatoire : garantit un token (et donc un tokenHash) unique même pour
+  // deux connexions du même utilisateur dans la même seconde.
+  const refreshToken = jwt.sign({ sub: userId, jti: crypto.randomUUID() }, env.jwt.refreshSecret, {
     expiresIn: env.jwt.refreshExpiresIn as SignOptions["expiresIn"],
   });
 
@@ -60,6 +63,16 @@ export async function login(input: LoginInput, ipAddress?: string) {
     throw AppError.unauthorized("errors.invalid_credentials");
   }
 
+  // Double authentification : si activée, un code TOTP valide est requis.
+  if (user.twoFactorEnabled && user.twoFactorSecret) {
+    if (!input.code) {
+      return { twoFactorRequired: true as const };
+    }
+    if (!verifyToken(user.twoFactorSecret, input.code)) {
+      throw AppError.unauthorized("errors.invalid_2fa_code");
+    }
+  }
+
   await prisma.user.update({
     where: { id: user.id },
     data: { failedLoginAttempts: 0, lockedUntil: null },
@@ -75,6 +88,45 @@ export async function login(input: LoginInput, ipAddress?: string) {
 
   const roles = user.roles.map((userRole) => userRole.role.name);
   return issueTokens(user.id, roles);
+}
+
+/** Génère un secret 2FA (non encore activé) et renvoie l'URI otpauth à configurer. */
+export async function setupTwoFactor(userId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw AppError.notFound();
+
+  const secret = generateSecret();
+  await prisma.user.update({ where: { id: userId }, data: { twoFactorSecret: secret } });
+  return { secret, otpauthUri: otpauthUri(secret, user.email) };
+}
+
+/** Active la 2FA après vérification d'un premier code émis par l'app d'authentification. */
+export async function enableTwoFactor(userId: string, code: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || !user.twoFactorSecret) {
+    throw AppError.badRequest("errors.validation_failed");
+  }
+  if (!verifyToken(user.twoFactorSecret, code)) {
+    throw AppError.unauthorized("errors.invalid_2fa_code");
+  }
+  await prisma.user.update({ where: { id: userId }, data: { twoFactorEnabled: true } });
+  await recordAuditLog({ userId, action: "auth.2fa.enable", entity: "User", entityId: userId });
+}
+
+/** Désactive la 2FA (nécessite un code valide). */
+export async function disableTwoFactor(userId: string, code: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user || !user.twoFactorSecret) {
+    throw AppError.badRequest("errors.validation_failed");
+  }
+  if (!verifyToken(user.twoFactorSecret, code)) {
+    throw AppError.unauthorized("errors.invalid_2fa_code");
+  }
+  await prisma.user.update({
+    where: { id: userId },
+    data: { twoFactorEnabled: false, twoFactorSecret: null },
+  });
+  await recordAuditLog({ userId, action: "auth.2fa.disable", entity: "User", entityId: userId });
 }
 
 export async function refresh(refreshToken: string) {

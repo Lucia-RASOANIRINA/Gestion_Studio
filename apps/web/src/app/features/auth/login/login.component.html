@@ -1,6 +1,6 @@
 <div class="flex min-h-screen items-center justify-center bg-gs-black px-4 py-8">
   <form
-    class="w-full max-w-sm bg-gs-dark-gray rounded-xl p-6 sm:p-8 shadow-xl border border-white/5"
+    class="w-full max-w-sm bg-gs-dark-gray rounded-xl p-6 sm:p-8 shadow-xl border border-gs-border"
     (ngSubmit)="submit()"
   >
     <div class="flex items-center gap-2 mb-6">
@@ -20,7 +20,7 @@
         name="email"
         [(ngModel)]="email"
         required
-        class="w-full rounded-md bg-gs-black border border-white/10 pl-10 pr-3 py-2 text-gs-light focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border pl-10 pr-3 py-2 text-gs-light focus:outline-none focus:border-gs-blue"
       />
     </div>
 
@@ -34,9 +34,29 @@
         name="password"
         [(ngModel)]="password"
         required
-        class="w-full rounded-md bg-gs-black border border-white/10 pl-10 pr-3 py-2 text-gs-light focus:outline-none focus:border-gs-blue"
+        [disabled]="twoFactorRequired()"
+        class="w-full rounded-md bg-gs-black border border-gs-border pl-10 pr-3 py-2 text-gs-light focus:outline-none focus:border-gs-blue disabled:opacity-50"
       />
     </div>
+
+    @if (twoFactorRequired()) {
+      <label class="block text-sm text-gs-light/70 mb-1">{{ 'auth.login.code' | translate }}</label>
+      <div class="relative mb-6">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gs-light/40">
+          <gs-icon name="lock" [size]="16" />
+        </span>
+        <input
+          type="text"
+          name="code"
+          inputmode="numeric"
+          autocomplete="one-time-code"
+          maxlength="6"
+          [(ngModel)]="code"
+          placeholder="123456"
+          class="w-full rounded-md bg-gs-black border border-gs-border pl-10 pr-3 py-2 tracking-widest text-gs-light focus:outline-none focus:border-gs-blue"
+        />
+      </div>
+    }
 
     @if (error(); as errorKey) {
       <p class="text-gs-orange text-sm mb-4">{{ errorKey | translate }}</p>

@@ -17,17 +17,27 @@ export class LoginComponent {
 
   email = "admin@gestion-studio.mg";
   password = "";
+  code = "";
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
+  readonly twoFactorRequired = signal(false);
 
   async submit(): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
     try {
-      await this.auth.login(this.email, this.password);
+      const result = await this.auth.login(
+        this.email,
+        this.password,
+        this.twoFactorRequired() ? this.code : undefined
+      );
+      if (result.twoFactorRequired) {
+        this.twoFactorRequired.set(true);
+        return;
+      }
       await this.router.navigateByUrl("/dashboard");
     } catch {
-      this.error.set("auth.login.error");
+      this.error.set(this.twoFactorRequired() ? "auth.login.code_error" : "auth.login.error");
     } finally {
       this.loading.set(false);
     }
