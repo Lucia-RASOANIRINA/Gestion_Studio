@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../../config/prisma";
 import type { CreateClientInput, ListClientsQuery, UpdateClientInput } from "./clients.validation";
+import { pointsForPayment, withTier } from "./clients.loyalty";
 
 export async function listClients(query: ListClientsQuery) {
   const where: Prisma.ClientWhereInput = {
@@ -27,32 +28,49 @@ export async function listClients(query: ListClientsQuery) {
     prisma.client.count({ where }),
   ]);
 
-  return { items, total, page: query.page, pageSize: query.pageSize };
+  return { items: items.map(withTier), total, page: query.page, pageSize: query.pageSize };
 }
 
 export async function getClientById(id: string) {
-  return prisma.client.findUnique({
+  const client = await prisma.client.findUnique({
     where: { id },
     include: {
       projects: { orderBy: { createdAt: "desc" } },
       _count: { select: { projects: true } },
     },
   });
+  return client ? withTier(client) : null;
 }
 
 export async function createClient(input: CreateClientInput, createdById?: string) {
-  return prisma.client.create({
-    data: { ...input, createdById },
-  });
+  const client = await prisma.client.create({ data: { ...input, createdById } });
+  return withTier(client);
 }
 
 export async function updateClient(id: string, input: UpdateClientInput) {
-  return prisma.client.update({
-    where: { id },
-    data: input,
-  });
+  const client = await prisma.client.update({ where: { id }, data: input });
+  return withTier(client);
 }
 
 export async function deleteClient(id: string) {
   await prisma.client.delete({ where: { id } });
+}
+
+/** Active/désactive la blacklist d'un client (mauvais payeur, fraude…). */
+export async function setBlacklist(id: string, isBlacklisted: boolean, reason?: string | null) {
+  const client = await prisma.client.update({
+    where: { id },
+    data: { isBlacklisted, blacklistReason: isBlacklisted ? (reason ?? null) : null },
+  });
+  return withTier(client);
+}
+
+/** Crédite les points de fidélité d'un client suite à un paiement encaissé. */
+export async function awardLoyaltyPoints(clientId: string, amountPaid: number) {
+  const points = pointsForPayment(amountPaid);
+  if (points <= 0) return;
+  await prisma.client.update({
+    where: { id: clientId },
+    data: { loyaltyPoints: { increment: points } },
+  });
 }

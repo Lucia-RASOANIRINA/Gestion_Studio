@@ -12,6 +12,13 @@
   </a>
 </div>
 
+@if (error(); as errorKey) {
+  <div class="flex items-center gap-2 rounded-md border border-gs-orange/40 bg-gs-orange/10 text-gs-orange text-sm px-4 py-3 mb-4">
+    <gs-icon name="alert" [size]="16" />
+    {{ errorKey | translate }}
+  </div>
+}
+
 <div class="flex flex-col sm:flex-row gap-3 mb-4">
   <div class="relative flex-1">
     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gs-light/40">
@@ -22,13 +29,13 @@
       [(ngModel)]="search"
       (ngModelChange)="load()"
       [placeholder]="'clients.search_placeholder' | translate"
-      class="w-full rounded-md bg-gs-dark-gray border border-white/10 pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-dark-gray border border-gs-border pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     />
   </div>
   <select
     [(ngModel)]="segmentFilter"
     (ngModelChange)="load()"
-    class="rounded-md bg-gs-dark-gray border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+    class="rounded-md bg-gs-dark-gray border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
   >
     <option value="">{{ 'clients.all_segments' | translate }}</option>
     @for (segment of segments; track segment) {
@@ -37,23 +44,32 @@
   </select>
 </div>
 
-<div class="bg-gs-dark-gray border border-white/5 rounded-xl overflow-x-auto">
+<div class="bg-gs-dark-gray border border-gs-border rounded-xl overflow-x-auto">
   <table class="w-full text-sm">
     <thead>
-      <tr class="text-left text-gs-light/50 border-b border-white/5">
+      <tr class="text-left text-gs-light/50 border-b border-gs-border">
         <th class="px-4 py-3 font-medium">{{ 'clients.table.name' | translate }}</th>
         <th class="px-4 py-3 font-medium">{{ 'clients.table.segment' | translate }}</th>
         <th class="px-4 py-3 font-medium hidden md:table-cell">{{ 'clients.table.contact' | translate }}</th>
         <th class="px-4 py-3 font-medium hidden lg:table-cell">{{ 'clients.table.projects' | translate }}</th>
-        <th class="px-4 py-3 font-medium">{{ 'clients.table.reliability' | translate }}</th>
+        <th class="px-4 py-3 font-medium">{{ 'clients.table.loyalty' | translate }}</th>
+        <th class="px-4 py-3 font-medium hidden sm:table-cell">{{ 'clients.table.reliability' | translate }}</th>
         <th class="px-4 py-3 font-medium text-right">{{ 'clients.table.actions' | translate }}</th>
       </tr>
     </thead>
     <tbody>
       @for (client of clients(); track client.id) {
-        <tr class="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+        <tr class="border-b border-gs-border last:border-0 hover:bg-gs-hover">
           <td class="px-4 py-3">
-            <a [routerLink]="['/clients', client.id, 'edit']" class="font-medium hover:text-gs-blue">{{ client.name }}</a>
+            <div class="flex items-center gap-2">
+              <a [routerLink]="['/clients', client.id, 'edit']" class="font-medium hover:text-gs-blue">{{ client.name }}</a>
+              @if (client.isBlacklisted) {
+                <span
+                  class="text-xs px-1.5 py-0.5 rounded bg-gs-orange/15 text-gs-orange"
+                  [title]="client.blacklistReason || ''"
+                >{{ 'clients.blacklist.badge' | translate }}</span>
+              }
+            </div>
           </td>
           <td class="px-4 py-3">
             <span class="text-xs px-2 py-1 rounded-full" [class]="segmentBadgeClass(client.segment)">
@@ -66,6 +82,14 @@
           </td>
           <td class="px-4 py-3 text-gs-light/70 hidden lg:table-cell">{{ client._count?.projects ?? 0 }}</td>
           <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-2 py-0.5 rounded-full" [class]="tierBadgeClass(client.tier)">
+                {{ ('clients.tier.' + client.tier) | translate }}
+              </span>
+              <span class="text-xs text-gs-light/50">{{ client.loyaltyPoints }} pts</span>
+            </div>
+          </td>
+          <td class="px-4 py-3 hidden sm:table-cell">
             <span [class.text-gs-green]="client.reliabilityScore >= 80"
                   [class.text-gs-orange]="client.reliabilityScore < 80">
               {{ client.reliabilityScore }}%
@@ -73,6 +97,15 @@
           </td>
           <td class="px-4 py-3">
             <div class="flex items-center justify-end gap-2">
+              <button
+                type="button"
+                class="text-gs-light/60 hover:text-gs-orange"
+                [class.text-gs-orange]="client.isBlacklisted"
+                [title]="'clients.blacklist.action' | translate"
+                (click)="toggleBlacklist(client)"
+              >
+                <gs-icon name="alert" [size]="16" />
+              </button>
               <a [routerLink]="['/clients', client.id, 'edit']" class="text-gs-light/60 hover:text-gs-blue">
                 <gs-icon name="edit" [size]="16" />
               </a>
@@ -84,7 +117,7 @@
         </tr>
       } @empty {
         <tr>
-          <td colspan="6" class="px-4 py-8 text-center text-gs-light/50">
+          <td colspan="7" class="px-4 py-8 text-center text-gs-light/50">
             {{ 'clients.empty' | translate }}
           </td>
         </tr>

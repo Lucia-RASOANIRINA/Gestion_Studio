@@ -10,14 +10,14 @@
 <form
   [formGroup]="form"
   (ngSubmit)="submit()"
-  class="max-w-2xl bg-gs-dark-gray border border-white/5 rounded-xl p-6 space-y-4"
+  class="max-w-2xl bg-gs-dark-gray border border-gs-border rounded-xl p-6 space-y-4"
 >
   <div>
     <label class="block text-sm text-gs-light/70 mb-1">{{ 'clients.form.name' | translate }}</label>
     <input
       type="text"
       formControlName="name"
-      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     />
     @if (form.controls.name.invalid && form.controls.name.touched) {
       <p class="text-gs-orange text-xs mt-1">{{ 'clients.form.name_error' | translate }}</p>
@@ -28,7 +28,7 @@
     <label class="block text-sm text-gs-light/70 mb-1">{{ 'clients.form.segment' | translate }}</label>
     <select
       formControlName="segment"
-      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     >
       @for (segment of segments; track segment) {
         <option [value]="segment">{{ ('clients.segment.' + segment) | translate }}</option>
@@ -42,7 +42,7 @@
       <input
         type="email"
         formControlName="email"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       />
       @if (form.controls.email.invalid && form.controls.email.touched) {
         <p class="text-gs-orange text-xs mt-1">{{ 'clients.form.email_error' | translate }}</p>
@@ -54,7 +54,7 @@
         type="text"
         formControlName="phone"
         placeholder="+261340000000"
-        class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+        class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
       />
       @if (form.controls.phone.invalid && form.controls.phone.touched) {
         <p class="text-gs-orange text-xs mt-1">{{ 'clients.form.phone_error' | translate }}</p>
@@ -67,7 +67,7 @@
     <input
       type="text"
       formControlName="address"
-      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     />
   </div>
 
@@ -76,7 +76,7 @@
     <textarea
       formControlName="notes"
       rows="3"
-      class="w-full rounded-md bg-gs-black border border-white/10 px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
+      class="w-full rounded-md bg-gs-black border border-gs-border px-3 py-2 text-sm focus:outline-none focus:border-gs-blue"
     ></textarea>
   </div>
 

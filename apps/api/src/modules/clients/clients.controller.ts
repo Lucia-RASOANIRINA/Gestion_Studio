@@ -45,6 +45,27 @@ export async function updateClientHandler(req: Request, res: Response) {
   res.json(client);
 }
 
+export async function blacklistClientHandler(req: Request, res: Response) {
+  const existing = await clientsService.getClientById(req.params.id);
+  if (!existing) {
+    throw AppError.notFound();
+  }
+  const client = await clientsService.setBlacklist(
+    req.params.id,
+    req.body.isBlacklisted,
+    req.body.reason
+  );
+  await recordAuditLog({
+    userId: req.user?.sub,
+    action: req.body.isBlacklisted ? "clients.blacklist.on" : "clients.blacklist.off",
+    entity: "Client",
+    entityId: client.id,
+    metadata: { reason: req.body.reason },
+    ipAddress: req.ip,
+  });
+  res.json(client);
+}
+
 export async function deleteClientHandler(req: Request, res: Response) {
   const existing = await clientsService.getClientById(req.params.id);
   if (!existing) {

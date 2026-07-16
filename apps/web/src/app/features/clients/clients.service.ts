@@ -41,4 +41,10 @@ export class ClientsService {
   remove(id: string): Promise<void> {
     return firstValueFrom(this.http.delete<void>(`${this.baseUrl}/${id}`));
   }
+
+  setBlacklist(id: string, isBlacklisted: boolean, reason?: string | null): Promise<Client> {
+    return firstValueFrom(
+      this.http.patch<Client>(`${this.baseUrl}/${id}/blacklist`, { isBlacklisted, reason })
+    );
+  }
 }

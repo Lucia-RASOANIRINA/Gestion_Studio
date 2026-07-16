@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { TranslateModule } from "@ngx-translate/core";
 import { PHONE_REGEX } from "@gestion-studio/shared";
 import { GsIconComponent } from "../../shared/icon/icon.component";
+import { resolveErrorMessageKey } from "../../shared/http-error.util";
 import { CLIENT_SEGMENTS, ClientSegment } from "./client.model";
 import { ClientsService } from "./clients.service";
 
@@ -38,15 +39,19 @@ export class ClientFormComponent implements OnInit {
     if (!id) return;
 
     this.clientId.set(id);
-    const client = await this.clientsService.getById(id);
-    this.form.patchValue({
-      name: client.name,
-      segment: client.segment,
-      email: client.email ?? "",
-      phone: client.phone ?? "",
-      address: client.address ?? "",
-      notes: client.notes ?? "",
-    });
+    try {
+      const client = await this.clientsService.getById(id);
+      this.form.patchValue({
+        name: client.name,
+        segment: client.segment,
+        email: client.email ?? "",
+        phone: client.phone ?? "",
+        address: client.address ?? "",
+        notes: client.notes ?? "",
+      });
+    } catch {
+      await this.router.navigateByUrl("/clients");
+    }
   }
 
   async submit(): Promise<void> {
@@ -66,8 +71,8 @@ export class ClientFormComponent implements OnInit {
         await this.clientsService.create(value);
       }
       await this.router.navigateByUrl("/clients");
-    } catch {
-      this.serverError.set("clients.form.error");
+    } catch (error) {
+      this.serverError.set(resolveErrorMessageKey(error));
     } finally {
       this.saving.set(false);
     }

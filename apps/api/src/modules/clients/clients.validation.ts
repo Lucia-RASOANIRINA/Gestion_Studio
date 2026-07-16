@@ -19,6 +19,11 @@ export const createClientSchema = z.object({
 
 export const updateClientSchema = createClientSchema.partial();
 
+export const blacklistClientSchema = z.object({
+  isBlacklisted: z.boolean(),
+  reason: z.string().trim().max(500).optional().nullable(),
+});
+
 export const listClientsQuerySchema = z.object({
   search: z.string().trim().optional(),
   segment: z.nativeEnum(ClientSegment).optional(),
@@ -29,3 +34,4 @@ export const listClientsQuerySchema = z.object({
 export type CreateClientInput = z.infer<typeof createClientSchema>;
 export type UpdateClientInput = z.infer<typeof updateClientSchema>;
 export type ListClientsQuery = z.infer<typeof listClientsQuerySchema>;
+export type BlacklistClientInput = z.infer<typeof blacklistClientSchema>;

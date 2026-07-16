@@ -5,13 +5,19 @@ import { requirePermission } from "../../common/rbac/requirePermission";
 import { asyncHandler } from "../../common/middleware/asyncHandler";
 import { validateBody, validateQuery } from "../../common/middleware/validate";
 import {
+  blacklistClientHandler,
   createClientHandler,
   deleteClientHandler,
   getClientHandler,
   listClientsHandler,
   updateClientHandler,
 } from "./clients.controller";
-import { createClientSchema, listClientsQuerySchema, updateClientSchema } from "./clients.validation";
+import {
+  blacklistClientSchema,
+  createClientSchema,
+  listClientsQuerySchema,
+  updateClientSchema,
+} from "./clients.validation";
 
 export const clientsRouter = Router();
 
@@ -39,6 +45,12 @@ clientsRouter.put(
   requirePermission(PermissionModule.CLIENTS, PermissionAction.UPDATE),
   validateBody(updateClientSchema),
   asyncHandler(updateClientHandler)
+);
+clientsRouter.patch(
+  "/:id/blacklist",
+  requirePermission(PermissionModule.CLIENTS, PermissionAction.UPDATE),
+  validateBody(blacklistClientSchema),
+  asyncHandler(blacklistClientHandler)
 );
 clientsRouter.delete(
   "/:id",

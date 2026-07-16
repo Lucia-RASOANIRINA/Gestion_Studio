@@ -2,6 +2,8 @@ import { ClientSegment } from "@gestion-studio/shared";
 
 export { ClientSegment };
 
+export type LoyaltyTier = "BRONZE" | "SILVER" | "GOLD" | "PLATINUM";
+
 export interface Client {
   id: string;
   name: string;
@@ -11,6 +13,10 @@ export interface Client {
   address: string | null;
   notes: string | null;
   reliabilityScore: number;
+  loyaltyPoints: number;
+  tier: LoyaltyTier;
+  isBlacklisted: boolean;
+  blacklistReason: string | null;
   createdAt: string;
   updatedAt: string;
   _count?: { projects: number };
