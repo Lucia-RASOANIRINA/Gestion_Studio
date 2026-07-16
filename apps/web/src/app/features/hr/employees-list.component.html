@@ -1,0 +1,66 @@
+<div>
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div class="flex items-center gap-2">
+      <gs-icon name="clients" [size]="22" class="text-gs-blue" />
+      <h2 class="font-display text-2xl font-semibold">{{ 'nav.hr' | translate }}</h2>
+    </div>
+    <a routerLink="/hr/new" class="inline-flex items-center gap-2 rounded-md bg-gs-blue px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90">
+      <gs-icon name="add" [size]="16" />
+      {{ 'hr.add' | translate }}
+    </a>
+  </div>
+
+  @if (loading()) {
+    <p class="text-gs-light/60">{{ 'common.loading' | translate }}</p>
+  } @else if (items().length === 0) {
+    <p class="text-gs-light/60">{{ 'hr.empty' | translate }}</p>
+  } @else {
+    <div class="hidden md:block overflow-x-auto rounded-lg border border-gs-border">
+      <table class="w-full text-sm">
+        <thead class="bg-gs-dark-gray text-left text-xs uppercase tracking-wide text-gs-light/50">
+          <tr>
+            <th class="px-4 py-3">{{ 'hr.table.name' | translate }}</th>
+            <th class="px-4 py-3">{{ 'hr.table.position' | translate }}</th>
+            <th class="px-4 py-3">{{ 'hr.table.type' | translate }}</th>
+            <th class="px-4 py-3 text-right">{{ 'hr.table.daily_rate' | translate }}</th>
+            <th class="px-4 py-3">{{ 'hr.table.leaves' | translate }}</th>
+            <th class="px-4 py-3 text-right">{{ 'hr.table.actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of items(); track e.id) {
+            <tr class="border-b border-gs-border last:border-0 hover:bg-gs-hover">
+              <td class="px-4 py-3">
+                <a [routerLink]="['/hr', e.id, 'edit']" class="font-medium hover:text-gs-blue">{{ e.firstName }} {{ e.lastName }}</a>
+              </td>
+              <td class="px-4 py-3 text-gs-light/70">{{ e.position }}</td>
+              <td class="px-4 py-3">
+                <span class="rounded-full px-2.5 py-0.5 text-xs" [class]="typeBadgeClass(e.type)">{{ ('hr.type.' + e.type) | translate }}</span>
+              </td>
+              <td class="px-4 py-3 text-right">{{ e.dailyRate ? (e.dailyRate | number) : '—' }}</td>
+              <td class="px-4 py-3 text-gs-light/70">{{ e._count?.leaveRequests ?? 0 }}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end gap-2">
+                  <a [routerLink]="['/hr', e.id, 'edit']" class="text-gs-light/60 hover:text-gs-blue"><gs-icon name="edit" [size]="16" /></a>
+                  <button type="button" class="text-gs-light/60 hover:text-gs-orange" (click)="remove(e)"><gs-icon name="delete" [size]="16" /></button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="md:hidden space-y-3">
+      @for (e of items(); track e.id) {
+        <a [routerLink]="['/hr', e.id, 'edit']" class="block rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+          <div class="flex items-center justify-between">
+            <span class="font-medium">{{ e.firstName }} {{ e.lastName }}</span>
+            <span class="rounded-full px-2.5 py-0.5 text-xs" [class]="typeBadgeClass(e.type)">{{ ('hr.type.' + e.type) | translate }}</span>
+          </div>
+          <p class="mt-1 text-sm text-gs-light/60">{{ e.position }}</p>
+        </a>
+      }
+    </div>
+  }
+</div>
