@@ -1,0 +1,156 @@
+<div class="max-w-3xl">
+  <a routerLink="/billing" class="inline-flex items-center gap-1 text-sm text-gs-light/60 hover:text-gs-blue mb-4">
+    <gs-icon name="back" [size]="16" />
+    {{ 'billing.form.back' | translate }}
+  </a>
+
+  <h2 class="font-display text-2xl font-semibold mb-6">{{ 'billing.form.create_title' | translate }}</h2>
+
+  <div class="space-y-5">
+    <!-- Client / projet -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <label class="block">
+        <span class="text-sm text-gs-light/70">{{ 'billing.form.client' | translate }}</span>
+        <select
+          [ngModel]="clientId()"
+          (ngModelChange)="clientId.set($event)"
+          class="mt-1 w-full rounded-md border border-gs-border bg-gs-dark-gray px-3 py-2 text-sm outline-none focus:border-gs-blue"
+        >
+          <option value="">{{ 'billing.form.select_client' | translate }}</option>
+          @for (client of clients(); track client.id) {
+            <option [value]="client.id">{{ client.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="block">
+        <span class="text-sm text-gs-light/70">{{ 'billing.form.project' | translate }}</span>
+        <select
+          [ngModel]="projectId()"
+          (ngModelChange)="projectId.set($event)"
+          class="mt-1 w-full rounded-md border border-gs-border bg-gs-dark-gray px-3 py-2 text-sm outline-none focus:border-gs-blue"
+        >
+          <option value="">{{ 'billing.form.no_project' | translate }}</option>
+          @for (project of projects(); track project.id) {
+            <option [value]="project.id">{{ project.reference }} — {{ project.title }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    <!-- Lignes -->
+    <div class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-medium">{{ 'billing.form.items' | translate }}</h3>
+        <button type="button" (click)="addItem()" class="inline-flex items-center gap-1 text-sm text-gs-blue hover:opacity-80">
+          <gs-icon name="add" [size]="16" />
+          {{ 'billing.form.add_item' | translate }}
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        @for (item of items(); track $index) {
+          <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+            <input
+              type="text"
+              [ngModel]="item.description"
+              (ngModelChange)="updateItem($index, 'description', $event)"
+              [placeholder]="'billing.form.item_description' | translate"
+              class="flex-1 rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+            />
+            <input
+              type="number"
+              min="0"
+              [ngModel]="item.quantity"
+              (ngModelChange)="updateItem($index, 'quantity', $event)"
+              [attr.aria-label]="'billing.form.item_quantity' | translate"
+              class="w-full sm:w-20 rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+            />
+            <input
+              type="number"
+              min="0"
+              [ngModel]="item.unitPrice"
+              (ngModelChange)="updateItem($index, 'unitPrice', $event)"
+              [attr.aria-label]="'billing.form.item_unit_price' | translate"
+              class="w-full sm:w-32 rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+            />
+            <button
+              type="button"
+              (click)="removeItem($index)"
+              class="text-gs-light/40 hover:text-gs-orange self-end sm:self-auto p-2"
+              [attr.aria-label]="'billing.form.remove_item' | translate"
+            >
+              <gs-icon name="delete" [size]="16" />
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Paramètres facture -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <label class="block">
+        <span class="text-sm text-gs-light/70">{{ 'billing.form.tax_rate' | translate }}</span>
+        <input
+          type="number"
+          min="0"
+          max="100"
+          [ngModel]="taxRate()"
+          (ngModelChange)="taxRate.set($event)"
+          class="mt-1 w-full rounded-md border border-gs-border bg-gs-dark-gray px-3 py-2 text-sm outline-none focus:border-gs-blue"
+        />
+      </label>
+      <label class="block sm:col-span-2">
+        <span class="text-sm text-gs-light/70">{{ 'billing.form.due_date' | translate }}</span>
+        <input
+          type="date"
+          [ngModel]="dueDate()"
+          (ngModelChange)="dueDate.set($event)"
+          class="mt-1 w-full rounded-md border border-gs-border bg-gs-dark-gray px-3 py-2 text-sm outline-none focus:border-gs-blue"
+        />
+      </label>
+    </div>
+
+    <label class="block">
+      <span class="text-sm text-gs-light/70">{{ 'billing.form.notes' | translate }}</span>
+      <textarea
+        rows="2"
+        [ngModel]="notes()"
+        (ngModelChange)="notes.set($event)"
+        class="mt-1 w-full rounded-md border border-gs-border bg-gs-dark-gray px-3 py-2 text-sm outline-none focus:border-gs-blue"
+      ></textarea>
+    </label>
+
+    <!-- Totaux -->
+    <div class="rounded-lg border border-gs-border bg-gs-dark-gray p-4 space-y-1 text-sm">
+      <div class="flex justify-between">
+        <span class="text-gs-light/60">{{ 'billing.totals.subtotal' | translate }}</span>
+        <span>{{ subtotal() | number }} MGA</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-gs-light/60">{{ 'billing.totals.tax' | translate }} ({{ taxRate() }}%)</span>
+        <span>{{ taxAmount() | number }} MGA</span>
+      </div>
+      <div class="flex justify-between border-t border-gs-border pt-1 font-semibold">
+        <span>{{ 'billing.totals.total' | translate }}</span>
+        <span class="text-gs-blue">{{ total() | number }} MGA</span>
+      </div>
+    </div>
+
+    @if (error()) {
+      <p class="text-sm text-gs-orange">{{ 'billing.form.error' | translate }}</p>
+    }
+
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        (click)="submit()"
+        [disabled]="!canSubmit() || saving()"
+        class="inline-flex items-center gap-2 rounded-md bg-gs-blue px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90 disabled:opacity-50"
+      >
+        <gs-icon name="check" [size]="16" />
+        {{ 'billing.form.save' | translate }}
+      </button>
+      <a routerLink="/billing" class="text-sm text-gs-light/60 hover:text-gs-light">{{ 'billing.form.cancel' | translate }}</a>
+    </div>
+  </div>
+</div>

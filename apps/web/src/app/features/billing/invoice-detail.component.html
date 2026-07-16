@@ -1,0 +1,289 @@
+<!-- Version imprimable (PDF) — visible uniquement à l'impression -->
+@if (invoice(); as inv) {
+  <div class="hidden print:block bg-white text-black p-8">
+    <div class="flex justify-between items-start border-b border-gray-300 pb-4 mb-6">
+      <div>
+        <h1 class="text-2xl font-bold">{{ 'app.title' | translate }}</h1>
+        <p class="text-sm text-gray-600">Antananarivo, Madagascar</p>
+      </div>
+      <div class="text-right">
+        <h2 class="text-xl font-bold">{{ 'billing.detail.pdf_title' | translate }}</h2>
+        <p class="text-sm">{{ inv.reference }}</p>
+        <p class="text-sm text-gray-600">{{ inv.issueDate | date: 'longDate' }}</p>
+      </div>
+    </div>
+    <div class="mb-6">
+      <p class="text-sm text-gray-500">{{ 'billing.table.client' | translate }}</p>
+      <p class="font-semibold">{{ inv.client.name }}</p>
+      @if (inv.dueDate) {
+        <p class="text-sm text-gray-600">{{ 'billing.table.due_date' | translate }}: {{ inv.dueDate | date: 'longDate' }}</p>
+      }
+    </div>
+    <table class="w-full text-sm border-collapse mb-6">
+      <thead>
+        <tr class="border-b border-gray-400 text-left">
+          <th class="py-2">{{ 'billing.form.item_description' | translate }}</th>
+          <th class="py-2 text-right">{{ 'billing.form.item_quantity' | translate }}</th>
+          <th class="py-2 text-right">{{ 'billing.form.item_unit_price' | translate }}</th>
+          <th class="py-2 text-right">{{ 'billing.totals.total' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of inv.items; track item.id) {
+          <tr class="border-b border-gray-200">
+            <td class="py-2">{{ item.description }}</td>
+            <td class="py-2 text-right">{{ item.quantity | number }}</td>
+            <td class="py-2 text-right">{{ item.unitPrice | number }}</td>
+            <td class="py-2 text-right">{{ (item.quantity * item.unitPrice) | number }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <div class="flex justify-end">
+      <table class="text-sm">
+        <tr><td class="pr-8 text-gray-600">{{ 'billing.totals.subtotal' | translate }}</td><td class="text-right">{{ inv.totals.subtotal | number }} MGA</td></tr>
+        <tr><td class="pr-8 text-gray-600">{{ 'billing.totals.tax' | translate }} ({{ inv.totals.taxRate }}%)</td><td class="text-right">{{ inv.totals.taxAmount | number }} MGA</td></tr>
+        <tr class="font-bold border-t border-gray-400"><td class="pr-8 pt-1">{{ 'billing.totals.total' | translate }}</td><td class="text-right pt-1">{{ inv.totals.total | number }} MGA</td></tr>
+        <tr><td class="pr-8 text-gray-600">{{ 'billing.kpi.paid' | translate }}</td><td class="text-right">{{ inv.totals.amountPaid | number }} MGA</td></tr>
+        <tr class="font-semibold"><td class="pr-8">{{ 'billing.table.balance' | translate }}</td><td class="text-right">{{ inv.totals.balance | number }} MGA</td></tr>
+      </table>
+    </div>
+    @if (inv.notes) {
+      <p class="mt-6 text-sm text-gray-600">{{ inv.notes }}</p>
+    }
+    @if (inv.signedAt) {
+      <div class="mt-8 flex justify-end">
+        <div class="text-center">
+          <img [src]="inv.signatureDataUrl" alt="signature" class="h-20 object-contain" />
+          <p class="border-t border-gray-400 pt-1 text-xs text-gray-600">{{ inv.signedBy }} · {{ inv.signedAt | date: 'longDate' }}</p>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<div class="max-w-4xl print:hidden">
+  <a routerLink="/billing" class="inline-flex items-center gap-1 text-sm text-gs-light/60 hover:text-gs-blue mb-4">
+    <gs-icon name="back" [size]="16" />
+    {{ 'billing.form.back' | translate }}
+  </a>
+
+  @if (loading()) {
+    <p class="text-gs-light/60">{{ 'common.loading' | translate }}</p>
+  } @else {
+    @if (invoice(); as inv) {
+    <div class="flex flex-wrap items-start justify-between gap-3 mb-6">
+      <div>
+        <h2 class="font-display text-2xl font-semibold text-gs-blue">{{ inv.reference }}</h2>
+        <p class="text-gs-light/70">{{ inv.client.name }}</p>
+        @if (inv.project) {
+          <p class="text-sm text-gs-light/50">{{ inv.project.reference }} — {{ inv.project.title }}</p>
+        }
+      </div>
+      <div class="flex flex-col items-end gap-2">
+        <span class="rounded-full px-3 py-1 text-sm font-medium" [class]="statusBadgeClass(inv.status)">
+          {{ ('billing.status.' + inv.status) | translate }}
+        </span>
+        <div class="flex items-center gap-3">
+          @if (!inv.signedAt && inv.status !== 'CANCELLED') {
+            <button type="button" (click)="openSign()" class="inline-flex items-center gap-1 text-xs text-gs-green hover:opacity-80">
+              <gs-icon name="edit" [size]="14" />
+              {{ 'billing.sign.action' | translate }}
+            </button>
+          }
+          <button type="button" (click)="downloadPdf()" class="inline-flex items-center gap-1 text-xs text-gs-blue hover:opacity-80">
+            <gs-icon name="download" [size]="14" />
+            {{ 'billing.detail.pdf' | translate }}
+          </button>
+          <button type="button" (click)="remove()" class="inline-flex items-center gap-1 text-xs text-gs-light/50 hover:text-gs-orange">
+            <gs-icon name="delete" [size]="14" />
+            {{ 'billing.detail.delete' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Colonne principale -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Lignes -->
+        <section class="rounded-lg border border-gs-border overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gs-dark-gray text-left text-xs uppercase tracking-wide text-gs-light/50">
+              <tr>
+                <th class="px-4 py-3">{{ 'billing.form.item_description' | translate }}</th>
+                <th class="px-4 py-3 text-right">{{ 'billing.form.item_quantity' | translate }}</th>
+                <th class="px-4 py-3 text-right">{{ 'billing.form.item_unit_price' | translate }}</th>
+                <th class="px-4 py-3 text-right">{{ 'billing.totals.total' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of inv.items; track item.id) {
+                <tr class="border-b border-gs-border last:border-0">
+                  <td class="px-4 py-3">{{ item.description }}</td>
+                  <td class="px-4 py-3 text-right">{{ item.quantity | number }}</td>
+                  <td class="px-4 py-3 text-right">{{ item.unitPrice | number }}</td>
+                  <td class="px-4 py-3 text-right">{{ (item.quantity * item.unitPrice) | number }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Paiements -->
+        <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+          <h3 class="font-medium mb-3">{{ 'billing.detail.payments' | translate }}</h3>
+          @if (inv.payments.length === 0) {
+            <p class="text-sm text-gs-light/50">{{ 'billing.detail.no_payments' | translate }}</p>
+          } @else {
+            <ul class="divide-y divide-gs-border">
+              @for (payment of inv.payments; track payment.id) {
+                <li class="flex items-center justify-between py-2 text-sm">
+                  <div>
+                    <span class="font-medium">{{ payment.amount | number }} MGA</span>
+                    <span class="text-gs-light/50"> · {{ ('billing.method.' + payment.method) | translate }}</span>
+                  </div>
+                  <span class="text-gs-light/50">{{ payment.paidAt | date: 'shortDate' }}</span>
+                </li>
+              }
+            </ul>
+          }
+
+          @if (inv.status !== 'PAID' && inv.status !== 'CANCELLED') {
+            <div class="mt-4 border-t border-gs-border pt-4">
+              <h4 class="text-sm font-medium mb-2">{{ 'billing.detail.add_payment' | translate }}</h4>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  [ngModel]="payAmount()"
+                  (ngModelChange)="payAmount.set($event)"
+                  [placeholder]="'billing.detail.amount' | translate"
+                  class="flex-1 rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+                />
+                <select
+                  [ngModel]="payMethod()"
+                  (ngModelChange)="payMethod.set($event)"
+                  class="rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue"
+                >
+                  @for (method of methods; track method) {
+                    <option [value]="method">{{ ('billing.method.' + method) | translate }}</option>
+                  }
+                </select>
+                <button
+                  type="button"
+                  (click)="recordPayment()"
+                  [disabled]="recording()"
+                  class="inline-flex items-center gap-1 rounded-md bg-gs-green px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90 disabled:opacity-50"
+                >
+                  <gs-icon name="check" [size]="16" />
+                  {{ 'billing.detail.record' | translate }}
+                </button>
+              </div>
+            </div>
+          }
+        </section>
+      </div>
+
+      <!-- Colonne latérale : totaux + statut -->
+      <div class="space-y-6">
+        <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-4 space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gs-light/60">{{ 'billing.totals.subtotal' | translate }}</span>
+            <span>{{ inv.totals.subtotal | number }} MGA</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gs-light/60">{{ 'billing.totals.tax' | translate }} ({{ inv.totals.taxRate }}%)</span>
+            <span>{{ inv.totals.taxAmount | number }} MGA</span>
+          </div>
+          <div class="flex justify-between border-t border-gs-border pt-2 font-semibold">
+            <span>{{ 'billing.totals.total' | translate }}</span>
+            <span class="text-gs-blue">{{ inv.totals.total | number }} MGA</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gs-light/60">{{ 'billing.kpi.paid' | translate }}</span>
+            <span class="text-gs-green">{{ inv.totals.amountPaid | number }} MGA</span>
+          </div>
+          <div class="flex justify-between font-semibold">
+            <span>{{ 'billing.table.balance' | translate }}</span>
+            <span [class.text-gs-orange]="inv.totals.balance > 0">{{ inv.totals.balance | number }} MGA</span>
+          </div>
+        </section>
+
+        <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+          <h3 class="text-sm font-medium mb-2">{{ 'billing.detail.change_status' | translate }}</h3>
+          <select
+            [ngModel]="inv.status"
+            (ngModelChange)="changeStatus($event)"
+            [disabled]="!!inv.signedAt"
+            class="w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue disabled:opacity-50"
+          >
+            @for (s of statuses; track s) {
+              <option [value]="s">{{ ('billing.status.' + s) | translate }}</option>
+            }
+          </select>
+        </section>
+
+        @if (inv.signedAt) {
+          <section class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+            <h3 class="text-sm font-medium mb-2">{{ 'billing.sign.signed_title' | translate }}</h3>
+            <div class="rounded-md bg-white p-2">
+              <img [src]="inv.signatureDataUrl" alt="signature" class="w-full h-24 object-contain" />
+            </div>
+            <p class="mt-2 text-xs text-gs-light/60">{{ inv.signedBy }} · {{ inv.signedAt | date: 'short' }}</p>
+          </section>
+        }
+
+        @if (error()) {
+          <p class="text-sm text-gs-orange">{{ 'billing.form.error' | translate }}</p>
+        }
+      </div>
+    </div>
+    } @else {
+      <p class="text-gs-orange">{{ 'common.errors.not_found' | translate }}</p>
+    }
+  }
+</div>
+
+<!-- Modal de signature électronique -->
+@if (signModalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 print:hidden">
+    <div class="w-full max-w-md rounded-lg border border-gs-border bg-gs-dark-gray p-5">
+      <h3 class="font-display text-lg font-semibold mb-1">{{ 'billing.sign.title' | translate }}</h3>
+      <p class="text-sm text-gs-light/60 mb-4">{{ 'billing.sign.hint' | translate }}</p>
+
+      <label class="block mb-3">
+        <span class="text-sm text-gs-light/70">{{ 'billing.sign.signer' | translate }}</span>
+        <input type="text" [ngModel]="signerName()" (ngModelChange)="signerName.set($event)"
+          class="mt-1 w-full rounded-md border border-gs-border bg-gs-black px-3 py-2 text-sm outline-none focus:border-gs-blue" />
+      </label>
+
+      <canvas
+        #sigCanvas
+        width="440"
+        height="180"
+        class="w-full h-44 rounded-md bg-white touch-none cursor-crosshair"
+        (pointerdown)="startDraw($event)"
+        (pointermove)="moveDraw($event)"
+        (pointerup)="endDraw()"
+        (pointerleave)="endDraw()"
+      ></canvas>
+
+      <div class="mt-4 flex items-center justify-between gap-3">
+        <button type="button" (click)="clearSignature()" class="text-sm text-gs-light/60 hover:text-gs-light">
+          {{ 'billing.sign.clear' | translate }}
+        </button>
+        <div class="flex items-center gap-3">
+          <button type="button" (click)="signModalOpen.set(false)" class="text-sm text-gs-light/60 hover:text-gs-light">
+            {{ 'billing.sign.cancel' | translate }}
+          </button>
+          <button type="button" (click)="saveSignature()"
+            class="inline-flex items-center gap-1 rounded-md bg-gs-green px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90">
+            <gs-icon name="check" [size]="16" />
+            {{ 'billing.sign.confirm' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

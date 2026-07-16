@@ -1,0 +1,131 @@
+<div>
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div class="flex items-center gap-2">
+      <gs-icon name="billing" [size]="22" class="text-gs-blue" />
+      <h2 class="font-display text-2xl font-semibold">{{ 'nav.billing' | translate }}</h2>
+    </div>
+    <a
+      routerLink="/billing/new"
+      class="inline-flex items-center gap-2 rounded-md bg-gs-blue px-4 py-2 text-sm font-semibold text-gs-black hover:opacity-90"
+    >
+      <gs-icon name="add" [size]="16" />
+      {{ 'billing.add' | translate }}
+    </a>
+  </div>
+
+  <!-- Onglets Facturation / Finances -->
+  <div class="flex gap-2 mb-6 border-b border-gs-border">
+    <span class="px-4 py-2 text-sm font-semibold text-gs-blue border-b-2 border-gs-blue">{{ 'finance.tabs.invoices' | translate }}</span>
+    <a routerLink="/billing/finance" class="px-4 py-2 text-sm text-gs-light/60 hover:text-gs-light">{{ 'finance.tabs.treasury' | translate }}</a>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+    @for (kpi of kpis(); track kpi.labelKey) {
+      <div class="rounded-lg border border-gs-border bg-gs-dark-gray p-4">
+        <p class="text-xs uppercase tracking-wide text-gs-light/50">{{ kpi.labelKey | translate }}</p>
+        <p class="mt-1 font-display text-xl font-semibold" [class]="kpi.accent">
+          {{ kpi.value | number }} <span class="text-sm text-gs-light/40">MGA</span>
+        </p>
+      </div>
+    }
+  </div>
+
+  <!-- Filtres -->
+  <div class="flex flex-col sm:flex-row gap-3 mb-4">
+    <div class="relative flex-1">
+      <span class="absolute inset-y-0 left-3 flex items-center text-gs-light/40">
+        <gs-icon name="search" [size]="16" />
+      </span>
+      <input
+        type="text"
+        [ngModel]="search()"
+        (ngModelChange)="search.set($event)"
+        (keyup.enter)="load()"
+        [placeholder]="'billing.search_placeholder' | translate"
+        class="w-full rounded-md border border-gs-border bg-gs-dark-gray pl-9 pr-3 py-2 text-sm outline-none focus:border-gs-blue"
+      />
+    </div>
+    <select
+      [ngModel]="status()"
+      (ngModelChange)="status.set($event); load()"
+      class="rounded-md border border-gs-border bg-gs-dark-gray px-3 py-2 text-sm outline-none focus:border-gs-blue"
+    >
+      <option value="">{{ 'billing.all_statuses' | translate }}</option>
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ ('billing.status.' + s) | translate }}</option>
+      }
+    </select>
+  </div>
+
+  @if (loading()) {
+    <p class="text-gs-light/60">{{ 'common.loading' | translate }}</p>
+  } @else if (invoices().length === 0) {
+    <p class="text-gs-light/60">{{ 'billing.empty' | translate }}</p>
+  } @else {
+    <!-- Table (tablette et plus) -->
+    <div class="hidden md:block overflow-x-auto rounded-lg border border-gs-border">
+      <table class="w-full text-sm">
+        <thead class="bg-gs-dark-gray text-left text-xs uppercase tracking-wide text-gs-light/50">
+          <tr>
+            <th class="px-4 py-3">{{ 'billing.table.reference' | translate }}</th>
+            <th class="px-4 py-3">{{ 'billing.table.client' | translate }}</th>
+            <th class="px-4 py-3">{{ 'billing.table.status' | translate }}</th>
+            <th class="px-4 py-3 text-right">{{ 'billing.table.total' | translate }}</th>
+            <th class="px-4 py-3 text-right">{{ 'billing.table.balance' | translate }}</th>
+            <th class="px-4 py-3">{{ 'billing.table.due_date' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (invoice of invoices(); track invoice.id) {
+            <tr
+              [routerLink]="['/billing', invoice.id]"
+              class="cursor-pointer border-b border-gs-border last:border-0 hover:bg-gs-hover"
+            >
+              <td class="px-4 py-3 font-medium text-gs-blue">{{ invoice.reference }}</td>
+              <td class="px-4 py-3">{{ invoice.client.name }}</td>
+              <td class="px-4 py-3">
+                <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" [class]="statusBadgeClass(invoice.status)">
+                  {{ ('billing.status.' + invoice.status) | translate }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-right">{{ invoice.totals.total | number }}</td>
+              <td class="px-4 py-3 text-right" [class.text-gs-orange]="invoice.totals.balance > 0">
+                {{ invoice.totals.balance | number }}
+              </td>
+              <td class="px-4 py-3 text-gs-light/70">
+                {{ invoice.dueDate ? (invoice.dueDate | date: 'shortDate') : '—' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cartes (mobile) -->
+    <div class="md:hidden space-y-3">
+      @for (invoice of invoices(); track invoice.id) {
+        <a
+          [routerLink]="['/billing', invoice.id]"
+          class="block rounded-lg border border-gs-border bg-gs-dark-gray p-4"
+        >
+          <div class="flex items-center justify-between">
+            <span class="font-medium text-gs-blue">{{ invoice.reference }}</span>
+            <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" [class]="statusBadgeClass(invoice.status)">
+              {{ ('billing.status.' + invoice.status) | translate }}
+            </span>
+          </div>
+          <p class="mt-1 text-sm">{{ invoice.client.name }}</p>
+          <div class="mt-3 flex items-center justify-between text-sm">
+            <span class="text-gs-light/60">{{ 'billing.table.total' | translate }}: {{ invoice.totals.total | number }}</span>
+            <span [class.text-gs-orange]="invoice.totals.balance > 0">
+              {{ 'billing.table.balance' | translate }}: {{ invoice.totals.balance | number }}
+            </span>
+          </div>
+        </a>
+      }
+    </div>
+
+    <p class="mt-4 text-sm text-gs-light/50">{{ total() }} {{ 'billing.total_suffix' | translate }}</p>
+  }
+</div>
