@@ -55,7 +55,7 @@ export async function transitionProjectHandler(req: Request, res: Response) {
     throw AppError.forbidden();
   }
 
-  const project = await projectsService.transitionProject(req.params.id, req.body.status);
+  const project = await projectsService.transitionProject(req.params.id, req.body.status, req.user?.sub);
   await recordAuditLog({
     userId: req.user?.sub,
     action: "projects.transition",
@@ -64,6 +64,16 @@ export async function transitionProjectHandler(req: Request, res: Response) {
     metadata: { to: req.body.status },
     ipAddress: req.ip,
   });
+  if (project.autoInvoice) {
+    await recordAuditLog({
+      userId: req.user?.sub,
+      action: "billing.invoice.auto_create",
+      entity: "Invoice",
+      entityId: project.autoInvoice.id,
+      metadata: { reference: project.autoInvoice.reference, projectId: project.id },
+      ipAddress: req.ip,
+    });
+  }
   res.json(project);
 }
 

@@ -1,7 +1,13 @@
+import crypto from "node:crypto";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../../config/prisma";
 import type { CreateClientInput, ListClientsQuery, UpdateClientInput } from "./clients.validation";
 import { pointsForPayment, withTier } from "./clients.loyalty";
+
+/** Code unique du badge client électronique (ex. GS-C-A1B2C3). */
+export function generateBadgeCode(): string {
+  return `GS-C-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+}
 
 export async function listClients(query: ListClientsQuery) {
   const where: Prisma.ClientWhereInput = {
@@ -43,7 +49,10 @@ export async function getClientById(id: string) {
 }
 
 export async function createClient(input: CreateClientInput, createdById?: string) {
-  const client = await prisma.client.create({ data: { ...input, createdById } });
+  // Badge client électronique généré automatiquement à l'ajout du client.
+  const client = await prisma.client.create({
+    data: { ...input, createdById, badgeCode: generateBadgeCode() },
+  });
   return withTier(client);
 }
 

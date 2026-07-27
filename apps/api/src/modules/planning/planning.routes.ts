@@ -17,6 +17,13 @@ import { createBookingSchema, listBookingsQuerySchema, updateBookingSchema } fro
 
 export const planningRouter = Router();
 
+// Route ICS publique - pas d'authentification requise
+planningRouter.get(
+  "/:id/ics",
+  asyncHandler(getBookingIcsHandler)
+);
+
+// Toutes les autres routes necessitent une authentification
 planningRouter.use(authenticate);
 
 planningRouter.get(
@@ -25,33 +32,33 @@ planningRouter.get(
   validateQuery(listBookingsQuerySchema),
   asyncHandler(listBookingsHandler)
 );
+
 planningRouter.get(
   "/engineers",
   requirePermission(PermissionModule.PLANNING, PermissionAction.READ),
   asyncHandler(listEngineersHandler)
 );
+
 planningRouter.get(
   "/:id",
   requirePermission(PermissionModule.PLANNING, PermissionAction.READ),
   asyncHandler(getBookingHandler)
 );
-planningRouter.get(
-  "/:id/ics",
-  requirePermission(PermissionModule.PLANNING, PermissionAction.READ),
-  asyncHandler(getBookingIcsHandler)
-);
+
 planningRouter.post(
   "/",
   requirePermission(PermissionModule.PLANNING, PermissionAction.CREATE),
   validateBody(createBookingSchema),
   asyncHandler(createBookingHandler)
 );
+
 planningRouter.put(
   "/:id",
   requirePermission(PermissionModule.PLANNING, PermissionAction.UPDATE),
   validateBody(updateBookingSchema),
   asyncHandler(updateBookingHandler)
 );
+
 planningRouter.delete(
   "/:id",
   requirePermission(PermissionModule.PLANNING, PermissionAction.DELETE),

@@ -87,6 +87,52 @@ export async function getInvoiceById(id: string) {
   return invoice ? withComputedTotals(invoice) : null;
 }
 
+/**
+ * Génère automatiquement une facture pour un projet (déclenché quand le projet
+ * passe au statut « Facturé »). Idempotent : ne crée rien si une facture est
+ * déjà rattachée au projet.
+ */
+export async function createInvoiceForProject(projectId: string, createdById?: string) {
+  const existing = await prisma.invoice.findFirst({ where: { projectId } });
+  if (existing) {
+    return withComputedTotals(
+      (await prisma.invoice.findUnique({ where: { id: existing.id }, include: invoiceInclude }))!
+    );
+  }
+
+  const project = await prisma.project.findUnique({ where: { id: projectId } });
+  if (!project) throw AppError.notFound();
+
+  const reference = await generateReference();
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 30);
+
+  const invoice = await prisma.invoice.create({
+    data: {
+      reference,
+      clientId: project.clientId,
+      projectId: project.id,
+      currency: project.budgetCurrency,
+      taxRate: 20,
+      status: InvoiceStatus.SENT,
+      dueDate,
+      createdById,
+      items: {
+        create: [
+          {
+            description: `${project.title} (${project.reference})`,
+            quantity: 1,
+            unitPrice: project.budgetAmount ?? 0,
+          },
+        ],
+      },
+    },
+    include: invoiceInclude,
+  });
+
+  return withComputedTotals(invoice);
+}
+
 export async function createInvoice(input: CreateInvoiceInput, createdById?: string) {
   const client = await prisma.client.findUnique({ where: { id: input.clientId } });
   if (!client) {

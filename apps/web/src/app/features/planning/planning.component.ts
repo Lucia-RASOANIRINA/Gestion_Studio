@@ -165,23 +165,28 @@ export class PlanningComponent implements OnInit {
   }
 
   async remove(booking: Booking, event: Event): Promise<void> {
-    event.stopPropagation();
-    const confirmed = await this.dialog.confirm({
-      title: this.translate.instant("common.dialog.delete_title"),
-      message: this.translate.instant("common.dialog.delete_named", { name: booking.title }),
-      confirmLabel: this.translate.instant("common.dialog.delete"),
-      danger: true,
-      icon: "delete",
-    });
-    if (!confirmed) return;
-    try {
-      await this.planningService.remove(booking.id);
-      this.toast.success(this.translate.instant("common.toast.deleted"));
-      await this.load();
-    } catch (error) {
-      this.toast.error(this.translate.instant(resolveErrorMessageKey(error)));
-    }
+  // Empecher la propagation et le comportement par defaut
+  event.stopPropagation();
+  event.preventDefault();
+  
+  const confirmed = await this.dialog.confirm({
+    title: this.translate.instant("common.dialog.delete_title"),
+    message: this.translate.instant("common.dialog.delete_named", { name: booking.title }),
+    confirmLabel: this.translate.instant("common.dialog.delete"),
+    danger: true,
+    icon: "delete",
+  });
+  
+  if (!confirmed) return;
+  
+  try {
+    await this.planningService.remove(booking.id);
+    this.toast.success(this.translate.instant("common.toast.deleted"));
+    await this.load();
+  } catch (error) {
+    this.toast.error(this.translate.instant(resolveErrorMessageKey(error)));
   }
+}
 
   downloadIcs(booking: Booking, event: Event): void {
     event.stopPropagation();

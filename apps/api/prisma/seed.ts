@@ -20,6 +20,7 @@ import {
   StudioStatus,
   StudioType,
 } from "@prisma/client";
+import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -1073,6 +1074,40 @@ async function main() {
           status: demoEmployee.leave.status,
           reason: demoEmployee.leave.reason,
         },
+      });
+    }
+  }
+
+  // Backfill des badges clients et tickets de réservation (codes uniques).
+  const randomCode = (prefix: string) =>
+    `${prefix}${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+  const clientsWithoutBadge = await prisma.client.findMany({ where: { badgeCode: null }, select: { id: true } });
+  for (const c of clientsWithoutBadge) {
+    await prisma.client.update({ where: { id: c.id }, data: { badgeCode: randomCode("GS-C-") } });
+  }
+  const bookingsWithoutTicket = await prisma.booking.findMany({ where: { ticketCode: null }, select: { id: true } });
+  for (const b of bookingsWithoutTicket) {
+    await prisma.booking.update({ where: { id: b.id }, data: { ticketCode: randomCode("GS-T-") } });
+  }
+
+  // Fil de notifications de démonstration (si vide) : quelques événements récents.
+  const notifCount = await prisma.notification.count();
+  if (notifCount === 0) {
+    const admin = await prisma.user.findUnique({ where: { email: "admin@gestion-studio.mg" } });
+    const actorName = admin ? "Admin Gestion Studio" : null;
+    const firstClient = await prisma.client.findFirst();
+    const firstProject = await prisma.project.findFirst();
+    const firstInvoice = await prisma.invoice.findFirst();
+    const demoNotifs = [
+      { action: "clients.create", entity: "Client", entityId: firstClient?.id },
+      { action: "projects.create", entity: "Project", entityId: firstProject?.id },
+      { action: "billing.invoice.create", entity: "Invoice", entityId: firstInvoice?.id },
+      { action: "billing.payment.create", entity: "Invoice", entityId: firstInvoice?.id },
+      { action: "auth.login", entity: "User", entityId: admin?.id },
+    ];
+    for (const n of demoNotifs) {
+      await prisma.notification.create({
+        data: { action: n.action, entity: n.entity, entityId: n.entityId ?? null, actorId: admin?.id, actorName },
       });
     }
   }

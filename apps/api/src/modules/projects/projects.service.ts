@@ -2,6 +2,7 @@ import { ProjectStatus, type Prisma } from "@prisma/client";
 import { prisma } from "../../config/prisma";
 import { AppError } from "../../common/errors/AppError";
 import { assertTransition } from "./project-workflow";
+import { createInvoiceForProject } from "../billing/billing.service";
 import type { CreateProjectInput, ListProjectsQuery, UpdateProjectInput } from "./projects.validation";
 
 async function generateReference(): Promise<string> {
@@ -67,17 +68,26 @@ export async function updateProject(id: string, input: UpdateProjectInput) {
   });
 }
 
-export async function transitionProject(id: string, to: ProjectStatus) {
+export async function transitionProject(id: string, to: ProjectStatus, createdById?: string) {
   const project = await prisma.project.findUnique({ where: { id } });
   if (!project) {
     throw AppError.notFound();
   }
   assertTransition(project.status, to);
-  return prisma.project.update({
+  const updated = await prisma.project.update({
     where: { id },
     data: { status: to },
     include: { client: { select: { id: true, name: true, segment: true } } },
   });
+
+  // Facturation automatique : au passage au statut « Facturé », génère la facture.
+  let autoInvoice: { id: string; reference: string } | null = null;
+  if (to === ProjectStatus.INVOICED) {
+    const invoice = await createInvoiceForProject(id, createdById);
+    autoInvoice = { id: invoice.id, reference: invoice.reference };
+  }
+
+  return { ...updated, autoInvoice };
 }
 
 export async function deleteProject(id: string) {

@@ -1,8 +1,14 @@
+import crypto from "node:crypto";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../../config/prisma";
 import { AppError } from "../../common/errors/AppError";
 import { findConflicts, isNotInPast, isValidSessionDuration } from "./planning-conflict";
 import type { CreateBookingInput, ListBookingsQuery, UpdateBookingInput } from "./planning.validation";
+
+/** Code unique du ticket électronique de réservation (ex. GS-T-A1B2C3). */
+export function generateTicketCode(): string {
+  return `GS-T-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+}
 
 const bookingInclude = {
   project: { select: { id: true, title: true, reference: true } },
@@ -71,8 +77,9 @@ export async function createBooking(input: CreateBookingInput, createdById?: str
   assertValidTiming(input.startAt, input.endAt);
   await assertNoConflict(input);
 
+  // Ticket électronique généré automatiquement à la création de la réservation.
   return prisma.booking.create({
-    data: { ...input, createdById },
+    data: { ...input, createdById, ticketCode: generateTicketCode() },
     include: bookingInclude,
   });
 }
